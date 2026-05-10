@@ -1,0 +1,24 @@
+{
+  "name": "inventory-management-project",
+  "version": "1.0.0",
+  "description": "This system will allow a fictional store to track products, manage stock levels, categorize items, and view analytics. It will include a fully authenticated user flow.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hananya-ruderman/Inventory-Management-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/hananya-ruderman/Inventory-Management-System/issues"
+  },
+  "homepage": "https://github.com/hananya-ruderman/Inventory-Management-System#readme",
+  "dependencies": {
+    "fastify": "^5.8.5"
+  }
+}
