@@ -4,3 +4,10 @@ export interface Item {
     price: number;
     stock: number;
 }
+
+export interface User {
+    id: string;
+    username: string;
+    password: string;
+    role: 'admin' | 'user';
+}

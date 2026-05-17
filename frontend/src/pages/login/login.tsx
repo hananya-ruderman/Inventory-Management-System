@@ -30,8 +30,8 @@ export default function Login() {
             setError(new Error('An unknown error occurred'));
           }
         }
-    }
-
+    
+      }
     if (currentUser) {
       navigate('/dashboard');
     }
@@ -50,6 +50,8 @@ export default function Login() {
             </div>
             {error && <p>{error.message}</p>}
             <button type="submit" className="form-item">Login</button>
+            <label htmlFor="register-link">Don't have an account?</label>
+            <button id="register-link" className="form-item" onClick={() => navigate('/register')}>Register</button>
         </form>
     </div>
   );
