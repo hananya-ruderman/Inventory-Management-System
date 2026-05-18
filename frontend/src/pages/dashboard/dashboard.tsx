@@ -14,6 +14,7 @@ export default function Dashboard() {
         async function loadData() {
             try {
                 const items = await fetchItems();
+                console.log(items);
                 setData(items);
             } catch (error) {
                 console.error('Failed to fetch items:', error);

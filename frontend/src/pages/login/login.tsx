@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import { login } from '../../api/loginApi';
 import { useNavigate } from 'react-router';
 import './login.css'
@@ -20,7 +20,8 @@ export default function Login() {
         }
         try {
             const user = await login(id as string, username as string);
-            setCurrentUser(user);
+            console.log(user);
+            setCurrentUser(user.username);
         } catch (error) {
           if (error instanceof Error) {
             console.error('Login failed:', error.message);
@@ -32,9 +33,13 @@ export default function Login() {
         }
     
       }
-    if (currentUser) {
-      navigate('/dashboard');
-    }
+
+    useEffect(()=> {
+      if (currentUser){
+        navigate('/dashboard')
+      }
+    }, [currentUser])
+    
 
     return (
         <div className="login-container">
