@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import type { User } from "../users/usersTypes";
 import fs from "fs/promises";
+import bcrypt from 'bcrypt'
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Pick<User, "username" | "password"> }>(
@@ -24,10 +25,16 @@ export default async function authRoutes(fastify: FastifyInstance) {
       const users = JSON.parse(data);
       
       const user = users.users.find((user: User) => {
-        return user.username === username && user.password === password;
+        return user.username === username;
       });
       if (!user){
-        reply.status(404).send({massage: "user for this username or password is not found"})
+        reply.status(404).send({massage: "user for this username is not found"})
+      }
+
+      const correctPassword = await bcrypt.compare(password, user.password)
+      if (!correctPassword){
+         reply.status(404).send({massage: "password isn`t correct"})
+
       }
       const token = fastify.jwt.sign({
         username,

@@ -17,6 +17,30 @@
       "username": "jane_smith",
       "password": "345",
       "role": "user"
+    },
+    {
+      "id": 4,
+      "username": "hananya",
+      "password": "567",
+      "role": "user"
+    },
+    {
+      "id": 5,
+      "username": "hana",
+      "password": {},
+      "role": "user"
+    },
+    {
+      "id": 6,
+      "username": "han",
+      "password": {},
+      "role": "user"
+    },
+    {
+      "id": 7,
+      "username": "ha",
+      "password": "$2b$10$V.uuwwP41RI0nBlH.Zuw1eA/EEpRo5cUlF09t1VO89/43DjZNYYlW",
+      "role": "user"
     }
   ]
 }

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import itemsPlogin from './items/itemsPlogin';
 import authRoutes from './auth/loginPlogin';
 import jwtPlogin from './auth/jwtPlogin';
+import usersPlogin from './users/usersPlogin';
 // import jwtPlugin from './auth/jwtPlogin';
 
 dotenv.config();
@@ -19,6 +20,7 @@ server.get('/', function (request, reply) {
 
 server.register(jwtPlogin)
 server.register(authRoutes)
+server.register(usersPlogin)
 server.register(itemsPlogin)
 
 
