@@ -1,17 +1,19 @@
-import fp from 'fastify-plugin';
-import fastifyJwt from '@fastify/jwt';
-import {FastifyInstance, FastifyRequest, FastifyReply} from 'fastify';
+import fp from 'fastify-plugin'
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import fastifyJwt from '@fastify/jwt'
 
-export default fp(async (app: FastifyInstance) => {
-  app.register(fastifyJwt, {
-    secret: process.env.JWT_SECRET || 'defaultsecret'
-  });
+export default fp(async (fastify: FastifyInstance) => {
+    fastify.register(fastifyJwt, {
+        secret: process.env.JWT_SECRET || 'secret'
+       
+    })
 
-  app.decorate('authenticate', async function(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      await request.jwtVerify()
-    } catch (err) {
-      reply.send(err)
-    }       
+    fastify.decorate('auth', async(request:FastifyRequest, reply: FastifyReply)=> {
+        try {
+            await request.jwtVerify()
+        } catch (error) {
+            return reply.status(401).send({ message: 'Unauthenticate' });
+
+        }
+    })
 })
-});
