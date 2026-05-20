@@ -41,6 +41,12 @@
       "username": "ha",
       "password": "$2b$10$V.uuwwP41RI0nBlH.Zuw1eA/EEpRo5cUlF09t1VO89/43DjZNYYlW",
       "role": "user"
+    },
+    {
+      "id": 8,
+      "username": "eily",
+      "password": "$2b$10$SM7niU5AhPzZP/2lk0yGYuck.zDinZTCuioRyEHL4oV2BAG91rinu",
+      "role": "user"
     }
   ]
 }

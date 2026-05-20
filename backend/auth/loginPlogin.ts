@@ -23,7 +23,6 @@ export default async function authRoutes(fastify: FastifyInstance) {
       const data = await fs.readFile("users/users.json", "utf-8");
 
       const users = JSON.parse(data);
-      
       const user = users.users.find((user: User) => {
         return user.username === username;
       });
@@ -42,7 +41,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
       },{
         expiresIn: '1d'
       })
-      reply.send({massage: 'token created seccessfully', token})
+      reply.send({massage: 'token created seccessfully', username, token})
     },
   );
 }

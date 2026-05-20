@@ -37,6 +37,12 @@
 
 }
 
+.head-main {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
 .dashboard-content {
     grid-area: content;
     background-color: rgb(77, 190, 132);
