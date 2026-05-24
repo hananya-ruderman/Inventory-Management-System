@@ -38,7 +38,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         id: itemsObj.items.length + 1,
         name,
         price,
-        quantity: quantity ?? 1,
+        quantity: quantity || 1,
       };
 
       itemsObj.items.push(newItem);
