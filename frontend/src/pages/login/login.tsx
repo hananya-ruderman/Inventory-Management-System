@@ -21,6 +21,7 @@ export default function Login() {
     try {
       const user = await login(username as string, password as string);
       setCurrentUser(user.username);
+      navigate('/dashboard')
     } catch (error) {
       if (error instanceof Error) {
         console.error("Login failed:", error.message);
@@ -32,11 +33,7 @@ export default function Login() {
     }
   }
 
-  useEffect(() => {
-    if (currentUser) {
-      navigate("/dashboard");
-    }
-  }, [currentUser, navigate]);
+
 
   return (
     <div className="login-container">
