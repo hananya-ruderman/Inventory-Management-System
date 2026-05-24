@@ -10,11 +10,24 @@
 }
 
 .add-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.error{
-    color: red;
+.error {
+  color: red;
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  border: none;
+  background: transparent;
+
+  font-size: 1.5rem;
+  cursor: pointer;
 }

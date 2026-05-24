@@ -6,10 +6,10 @@ type status = "idle" | "loading" | "success" | "error";
 
 export default function Model({
   setIsOpen,
-  onSuccess
+  onSuccess,
 }: {
-  setIsOpen: React.Dispatch<SetStateAction<boolean>>,
-  onSuccess: ()=> void
+  setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+  onSuccess: () => void;
 }) {
   const [name, setName] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function Model({
       setStatus("success");
       setTimeout(() => {
         setIsOpen(false);
-        onSuccess()
+        onSuccess();
       }, 2000);
     } catch (error) {
       setStatus("error");
@@ -46,6 +46,9 @@ export default function Model({
     <div className="add-item-container">
       {status === "idle" && (
         <div className="add-item">
+          <button className="close-btn" onClick={() => setIsOpen(false)}>
+            ×
+          </button>
           <h3>new item</h3>
           <label htmlFor="name">name*</label>
           <input
