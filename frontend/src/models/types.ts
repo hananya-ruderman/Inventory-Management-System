@@ -2,7 +2,7 @@ export interface Item {
     id: string | number;
     name: string;
     price: number;
-    stock: number;
+    quantity: number;
 }
 
 export interface User {
@@ -11,3 +11,4 @@ export interface User {
     password: string;
     role: 'admin' | 'user';
 }
+

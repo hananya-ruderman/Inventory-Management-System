@@ -8,12 +8,16 @@ export async function fetchItems() {
 
 export async function editItem(id: Item['id'], item: Item){
     const response = await api.put(`/items/${id}`, item)
+    return response.data
+}
+
+export async function addItem(item: Omit<Item, 'id'>){
+    const response = await api.post(`/items`, item)
     console.log(response.data);
     return response.data
 }
 
 export async function deleteItem(id: Item['id']){
     const response = await api.delete(`/items/${id}`)
-    console.log(response.data);
     return response.data
 }

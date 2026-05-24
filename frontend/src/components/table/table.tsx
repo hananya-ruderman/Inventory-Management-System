@@ -29,14 +29,14 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
     if (editingItem === null) return;
     await editItem(editingItem.id, editingItem);
     const fetchedItems = await fetchItems();
-    setData(fetchedItems);
+    setData(fetchedItems.items);
     setEditRow(null);
   }
 
   async function handleDelete(row: Item) {
     await deleteItem(row.id)
     const fetchedItems = await fetchItems()
-    setData(fetchedItems)
+    setData(fetchedItems.items)
   }
 
   if (!Array.isArray(data) || data.length === 0) {
@@ -70,10 +70,10 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
                 <td>{value}</td>
               )
 })}
-            <td>
-              <button onClick={() => handleEdit(row)}>Edit</button>
-              {editRow && <button onClick={handleSave}>Save</button>}
-              <button onClick={() => handleDelete(row)}>Delete</button>
+            <td className="buttons">
+              <button className="button" onClick={() => handleEdit(row)}>Edit</button>
+              {editRow && <button className="button" onClick={handleSave}>Save</button>}
+              <button className="button" onClick={() => handleDelete(row)}>Delete</button>
             </td>
           </tr>
         ))}

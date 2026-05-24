@@ -4,26 +4,24 @@ import { Table } from "../../components/table/table";
 import { useState, useEffect } from "react";
 import { fetchItems } from "../../api/dataApi";
 import type { Item } from "../../models/types";
+import Model from "../../components/model/Model";
 
 export default function Dashboard() {
   const { currentUser, setCurrentUser } = useUser();
   const [data, setData] = useState<Item[]>([]);
   const [filteredData, setFilteredData] = useState<Item[] | null>(null);
-  const [newItem, setNewItem] = useState<Item | null>(null);
-
-  currentUser
-    ? localStorage.setItem("currentUser", currentUser)
-    : setCurrentUser(localStorage.getItem("currentUser"));
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const items = await fetchItems();
-        setData(items.items);
-      } catch (error) {
-        console.error("Failed to fetch items:", error);
-      }
+    if (currentUser) {
+      localStorage.setItem("currentUser", currentUser);
+    } else {
+      const stored = localStorage.getItem("currentUser");
+      if (stored) setCurrentUser(stored);
     }
+  }, [currentUser]);
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -35,7 +33,14 @@ export default function Dashboard() {
     setFilteredData(searchedData);
   }
 
-  async function handleAdd() {}
+  async function loadData() {
+    try {
+      const items = await fetchItems();
+      setData(items.items);
+    } catch (error) {
+      console.error("Failed to fetch items:", error);
+    }
+  }
 
   return (
     <div className="dashboard-container">
@@ -73,8 +78,19 @@ export default function Dashboard() {
       </aside>
       <main className="dashboard-content">
         <h2 className="head-main">
-          Dashboard <button onClick={handleAdd}>add item</button>
+          Dashboard{" "}
+          <button disabled={isOpen} onClick={() => setIsOpen(true)}>
+            Add Item
+          </button>
         </h2>
+
+        {isOpen && (
+          <div className="backdrop">
+            <div className="modal">
+              <Model setIsOpen={setIsOpen} onSuccess={loadData} />
+            </div>
+          </div>
+        )}
         <Table data={filteredData ?? data} setData={setData} />
       </main>
     </div>

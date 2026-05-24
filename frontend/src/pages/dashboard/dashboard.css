@@ -2,49 +2,58 @@
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-rows: auto 1fr;
-  grid-template-areas: 
+  grid-template-areas:
     "navbar navbar"
     "aside content";
-    
-    height: 100vh;
-    width: 100vw;
 
+  height: 100vh;
+  width: 100vw;
 }
 
 .dashboard-container > * {
   border: 1px solid blue;
-    padding: 20px;
-
+  padding: 20px;
 }
 
 .logo {
-    width: 50px;
-    height: 50px;
+  width: 50px;
+  height: 50px;
 }
 
 .navbar {
-    grid-area: navbar;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: rgb(77, 77, 190);
+  grid-area: navbar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: rgb(77, 77, 190);
 }
 
 .sidebar {
-    grid-area: aside;
-    display: flex;
-    flex-direction: column;
-
+  grid-area: aside;
+  display: flex;
+  flex-direction: column;
 }
 
 .head-main {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
 }
 
 .dashboard-content {
-    grid-area: content;
-    background-color: rgb(77, 190, 132);
+  grid-area: content;
+  background-color: rgb(77, 190, 132);
 }
 
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  z-index: 1000;
+}
+
+.model {
+    z-index: 1001;
+
+}
