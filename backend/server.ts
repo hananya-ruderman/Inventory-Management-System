@@ -12,7 +12,7 @@ const server = Fastify({logger: false});
 const port = Number(process.env.SERVER_PORT || 3000)
 server.register(cors, {
     origin: 'http://localhost:5173',
-    methods:['GET', 'POST', 'PUT', 'PETCH', 'DELETE']
+    methods:['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
 
 });
 server.get('/', function (request, reply) {
