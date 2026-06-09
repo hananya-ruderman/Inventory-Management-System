@@ -1,12 +1,14 @@
 import Fastify from 'fastify'
 import cors from '@fastify/cors';
-import dotenv from 'dotenv';
 import itemsPlogin from './items/itemsPlogin';
 import authRoutes from './auth/loginPlogin';
 import jwtPlogin from './auth/jwtPlogin';
 import usersPlogin from './users/usersPlogin';
-
+import dotenv from 'dotenv';
 dotenv.config();
+
+
+
 const server = Fastify({logger: false});
 
 const port = Number(process.env.SERVER_PORT || 3000)

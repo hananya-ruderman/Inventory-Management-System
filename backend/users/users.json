@@ -71,6 +71,12 @@
       "username": "e",
       "password": "$2b$10$F8mZVjVNwubY9hp3kjL5fu/hjdH74A6JMAEM9HsmINvoz8HSZkKTW",
       "role": "user"
+    },
+    {
+      "id": 13,
+      "username": "amty",
+      "password": "$2b$10$PGlDBHLng9GrnoUz99B.heVIGw91leZdiZW9I7pzLEBNlTYREieHG",
+      "role": "admin"
     }
   ]
 }
