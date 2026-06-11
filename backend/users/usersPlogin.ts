@@ -1,7 +1,8 @@
 import type { FastifyInstance } from "fastify";
-import fs from "fs/promises";
-import type { User } from "./usersTypes";
-import bcrypt from 'bcrypt'
+import type { User } from "./usersTypes.js";
+import bcrypt from "bcrypt";
+import { prisma } from "../db/dbConn.js";
+import { env } from "../config/env.js";
 
 export default async function usersPlogin(fastify: FastifyInstance) {
   fastify.post<{ Body: Omit<User, "id"> }>(
@@ -19,36 +20,33 @@ export default async function usersPlogin(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-        const {username, password, role} = request.body
+      const { username, password, role } = request.body;
 
-        const data = await fs.readFile('./users/users.json', 'utf-8')
+      const user = await prisma.user.findUnique({
+        where: { username },
+      });
 
-        const users = JSON.parse(data)
-
-        const existingUser = users.users.find((user: User) => {
-           return user.username === username 
-        })
-
-        if (existingUser) {
-        return reply.status(400).send({message: "User already exists"});
+      if (user) {
+        return reply.status(400).send({ message: "User already exists" });
       }
 
-      const salt = await bcrypt.genSalt(10)
-      const hashedPassword = await bcrypt.hash(password, salt)
+      const salt = await bcrypt.genSalt(env.saltRounds);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
-      const newUser = {
-        id: users.users.length + 1,
-        username,
-        password: hashedPassword,
-        role: role || 'user'
+      const newUser = await prisma.user.create({
+        data: {
+          username,
+          passwordHash: hashedPassword,
+          role: role || "user",
+        },
+      });
 
-      }
-
-      users.users.push(newUser)
-
-      await fs.writeFile('./users/users.json', JSON.stringify(users, null, 2))
-
-      reply.status(201).send({massage: 'user created', user: {id: newUser.id, username: newUser.username }})
+      reply
+        .status(201)
+        .send({
+          massage: "user created",
+          user: { id: newUser.id, username: newUser.username },
+        });
     },
   );
 }

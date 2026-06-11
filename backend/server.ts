@@ -1,17 +1,18 @@
+import {env} from './config/env.js'
 import Fastify from 'fastify'
 import cors from '@fastify/cors';
-import itemsPlogin from './items/itemsPlogin';
-import authRoutes from './auth/loginPlogin';
-import jwtPlogin from './auth/jwtPlogin';
-import usersPlogin from './users/usersPlogin';
-import dotenv from 'dotenv';
-dotenv.config();
+import itemsPlogin from './items/itemsPlogin.js';
+import authRoutes from './auth/loginPlogin.js';
+import jwtPlogin from './auth/jwtPlogin.js';
+import usersPlogin from './users/usersPlogin.js';
+import {prisma} from './db/dbConn.js'
+
 
 
 
 const server = Fastify({logger: false});
 
-const port = Number(process.env.SERVER_PORT || 3000)
+const port = Number(env.serverPort || 3000)
 server.register(cors, {
     origin: 'http://localhost:5173',
     methods:['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
@@ -33,6 +34,8 @@ async function startServer() {
     try {
         await server.listen({port});
         console.log("Server is running on port 3000");
+        prisma.$connect()
+        console.log('Connected to postgreSql DB through prisma');
     } catch (error) {
         console.error("Error starting server:", error);
     }

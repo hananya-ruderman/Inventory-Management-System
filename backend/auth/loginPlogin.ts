@@ -1,7 +1,7 @@
-import { FastifyInstance } from "fastify";
-import type { User } from "../users/usersTypes";
+import type { FastifyInstance } from "fastify";
+import type { User } from "../users/usersTypes.ts";
 import bcrypt from 'bcrypt'
-import {prisma} from '../db/dbConn'
+import {prisma} from '../db/dbConn.js'
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Pick<User, "username" | "password"> }>(
@@ -33,6 +33,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       }
       const token = fastify.jwt.sign({
+        id: user.id,
         username,
         role: user.role
       },{

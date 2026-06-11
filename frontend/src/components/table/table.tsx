@@ -6,6 +6,7 @@ import { useState } from "react";
 type setData = React.Dispatch<React.SetStateAction<Item[]>>;
 
 export function Table({ data, setData }: { data: Item[]; setData: setData }) {
+  console.log(data);
   const [editRow, setEditRow] = useState<Item["id"] | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
@@ -29,14 +30,14 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
     if (editingItem === null) return;
     await editItem(editingItem.id, editingItem);
     const fetchedItems = await fetchItems();
-    setData(fetchedItems.items);
+    setData(fetchedItems);
     setEditRow(null);
   }
 
   async function handleDelete(row: Item) {
     await deleteItem(row.id)
     const fetchedItems = await fetchItems()
-    setData(fetchedItems.items)
+    setData(fetchedItems)
   }
 
   if (!Array.isArray(data) || data.length === 0) {

@@ -13,7 +13,6 @@ export async function editItem(id: Item['id'], item: Item){
 
 export async function addItem(item: Omit<Item, 'id'>){
     const response = await api.post(`/items`, item)
-    console.log(response.data);
     return response.data
 }
 
