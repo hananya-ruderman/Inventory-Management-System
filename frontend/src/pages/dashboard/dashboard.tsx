@@ -2,11 +2,27 @@ import "./dashboard.css";
 import { useUser } from "../../state/user";
 import { Table } from "../../components/table/table";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { fetchItems } from "../../api/dataApi";
 import type { Item } from "../../models/types";
 import Model from "../../components/model/Model";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  TextField,
+  Button,
+  Dialog,
+} from "@mui/material";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUser();
   const [data, setData] = useState<Item[]>([]);
   const [filteredData, setFilteredData] = useState<Item[] | null>(null);
@@ -24,6 +40,11 @@ export default function Dashboard() {
   useEffect(() => {
     loadData();
   }, []);
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
 
   function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
     const query = event.target.value;
@@ -43,56 +64,108 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="dashboard-container">
-      <nav className="navbar">
-        <img
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Mazpenlogo.png/500px-Mazpenlogo.png"
-          alt="Logo"
-          className="logo"
-        />
-        <div className="user-info">
-          <span>Welcome, {currentUser}!</span>
-        </div>
-        <search className="search-bar">
-          <input onChange={handleSearch} type="text" placeholder="Search..." />
-        </search>
-      </nav>
-      <aside className="sidebar">
-        <ul>
-          <li>
-            <a href="#">Home</a>
-          </li>
-          <li>
-            <a href="#">Products</a>
-          </li>
-          <li>
-            <a href="#">Orders</a>
-          </li>
-          <li>
-            <a href="#">Customers</a>
-          </li>
-          <li>
-            <a href="#">Reports</a>
-          </li>
-        </ul>
-      </aside>
-      <main className="dashboard-content">
-        <h2 className="head-main">
-          Dashboard{" "}
-          <button disabled={isOpen} onClick={() => setIsOpen(true)}>
-            Add Item
-          </button>
-        </h2>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Box
+            component="img"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Mazpenlogo.png/500px-Mazpenlogo.png"
+            alt="Logo"
+            sx={{
+              height: 40,
+              mr: 3,
+            }}
+          />
 
-        {isOpen && (
-          <div className="backdrop">
-            <div className="modal">
-              <Model setIsOpen={setIsOpen} onSuccess={loadData} />
-            </div>
-          </div>
-        )}
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Welcome, {currentUser}!
+          </Typography>
+
+          <TextField
+            size="small"
+            placeholder="Search..."
+            onChange={handleSearch}
+            sx={{
+              backgroundColor: "white",
+              borderRadius: 1,
+            }}
+          />
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleLogout}
+            sx={{ ml: 3 }}
+          >
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          flexShrink: 0,
+
+          "& .MuiDrawer-paper": {
+            width: 240,
+            boxSizing: "border-box",
+            mt: 8,
+          },
+        }}
+      >
+        <List>
+          {["Home", "Products", "Orders", "Customers", "Reports"].map(
+            (item) => (
+              <ListItem key={item} disablePadding>
+                <ListItemButton>
+                  <ListItemText primary={item} />
+                </ListItemButton>
+              </ListItem>
+            ),
+          )}
+        </List>
+      </Drawer>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          mt: 8,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h4">Dashboard</Typography>
+
+          <Button
+            variant="contained"
+            disabled={isOpen}
+            onClick={() => setIsOpen(true)}
+          >
+            Add Item
+          </Button>
+        </Box>
+
+        <Dialog
+          open={isOpen}
+          onClose={() => setIsOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <Model setIsOpen={setIsOpen} onSuccess={loadData} />
+        </Dialog>
+
         <Table data={filteredData ?? data} setData={setData} />
-      </main>
-    </div>
+      </Box>
+    </Box>
   );
 }

@@ -1,7 +1,17 @@
 import type { Item } from "../../models/types";
-import "./table.css";
 import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
 import { useState } from "react";
+ import {
+  Paper,
+  Table as MuiTable,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  TextField,
+  Button,
+  Stack,
+} from "@mui/material";
 
 type setData = React.Dispatch<React.SetStateAction<Item[]>>;
 
@@ -43,41 +53,72 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
     return <p>No data available</p>;
   }
 
-  return (
-    <table className="table">
-      <thead>
-        <tr>
+
+
+return (
+  <Paper elevation={3}>
+    <MuiTable>
+      <TableHead>
+        <TableRow>
           {Object.keys(data[0]).map((key) => (
-            <th key={key}>{key}</th>
+            <TableCell key={key}>{key}</TableCell>
           ))}
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
+          <TableCell>Actions</TableCell>
+        </TableRow>
+      </TableHead>
+
+      <TableBody>
         {data.map((row) => (
-          <tr key={row.id as string | number}>
-            {Object.entries(row).map(([key, value]) =>{
-            const itemKey = key as keyof Item
-            return editRow === row.id ? (
-                <td>
-                  <input
-                    name={itemKey}
-                    value={editingItem?.[itemKey]}
-                    onChange={handleChange}
-                  />
-                </td>
-              ) : (
-                <td>{value}</td>
-              )
-})}
-            <td className="buttons">
-              <button className="button" onClick={() => handleEdit(row)}>Edit</button>
-              {editRow && <button className="button" onClick={handleSave}>Save</button>}
-              <button className="button" onClick={() => handleDelete(row)}>Delete</button>
-            </td>
-          </tr>
+          <TableRow key={row.id as string | number}>
+            {Object.entries(row).map(([key, value]) => {
+              const itemKey = key as keyof Item;
+
+              return (
+                <TableCell key={key}>
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      name={itemKey}
+                      value={editingItem?.[itemKey] ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    value
+                  )}
+                </TableCell>
+              );
+            })}
+
+            <TableCell>
+              <Stack direction="row" spacing={1}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleEdit(row)}
+                >
+                  Edit
+                </Button>
+
+                {editRow === row.id && (
+                  <Button
+                    variant="contained"
+                    onClick={handleSave}
+                  >
+                    Save
+                  </Button>
+                )}
+
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => handleDelete(row)}
+                >
+                  Delete
+                </Button>
+              </Stack>
+            </TableCell>
+          </TableRow>
         ))}
-      </tbody>
-    </table>
-  );
-}
+      </TableBody>
+    </MuiTable>
+  </Paper>
+)};

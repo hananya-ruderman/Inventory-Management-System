@@ -1,12 +1,20 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { login } from "../../api/loginApi";
 import { useNavigate } from "react-router";
 import "./login.css";
 import { useUser } from "../../state/user";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+} from "@mui/material";
+
 
 export default function Login() {
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useUser();
+  const { setCurrentUser } = useUser();
   const [error, setError] = useState<Error | null>(null);
 
   async function handleLogin(event: React.SubmitEvent<HTMLFormElement>) {
@@ -33,31 +41,72 @@ export default function Login() {
     }
   }
 
-  return (
-    <div className="login-container">
-      <h1>Login</h1>
-      <form className="login-form" onSubmit={handleLogin}>
-        <div className="form-item">
-          <label htmlFor="username">Username</label>
-          <input type="text" id="username" name="username" />
-        </div>
-        <div className="form-item">
-          <label htmlFor="password">Password</label>
-          <input type="password" id="password" name="password" />
-        </div>
-        {error && <p>{error.message}</p>}
-        <button type="submit" className="form-item">
+ 
+return (
+  <Box
+    sx={(theme)=> ({
+      minHeight: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: theme.palette.primary
+    })}
+  >
+    <Paper
+      elevation={3}
+      sx={{
+        p: 4,
+        width: 400,
+      }}
+    >
+      <Typography sx={{variant:"h4", mb: 3}}>
+        Login
+      </Typography>
+
+      <Box
+        component="form"
+        onSubmit={handleLogin}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
+        <TextField
+          label="Username"
+          name="username"
+          fullWidth
+        />
+
+        <TextField
+          label="Password"
+          name="password"
+          type="password"
+          fullWidth
+        />
+
+        {error && (
+          <Typography color="error">
+            {error.message}
+          </Typography>
+        )}
+
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+        >
           Login
-        </button>
-        <label htmlFor="register-link">Don't have an account?</label>
-        <button
-          id="register-link"
-          className="form-item"
+        </Button>
+
+        <Button
+          variant="text"
           onClick={() => navigate("/register")}
         >
           Register
-        </button>
-      </form>
-    </div>
-  );
+        </Button>
+      </Box>
+    </Paper>
+  </Box>
+);
 }
