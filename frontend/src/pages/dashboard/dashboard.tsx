@@ -86,7 +86,7 @@ export default function Dashboard() {
             placeholder="Search..."
             onChange={handleSearch}
             sx={{
-              backgroundColor: "white",
+              backgroundColor: "background.default",
               borderRadius: 1,
             }}
           />

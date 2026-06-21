@@ -44,13 +44,13 @@ export default function Login() {
  
 return (
   <Box
-    sx={(theme)=> ({
+    sx={{
       minHeight: "100vh",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: theme.palette.primary
-    })}
+      backgroundColor: "background.default"
+    }}
   >
     <Paper
       elevation={3}
