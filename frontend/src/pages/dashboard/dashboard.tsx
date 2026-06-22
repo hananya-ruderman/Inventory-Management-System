@@ -82,7 +82,6 @@ export default function Dashboard() {
           </Typography>
 
           <TextField
-            size="small"
             placeholder="Search..."
             onChange={handleSearch}
             sx={{
@@ -134,6 +133,7 @@ export default function Dashboard() {
           flexGrow: 1,
           p: 3,
           mt: 8,
+          bgcolor: "background.default",
         }}
       >
         <Box
