@@ -22,7 +22,6 @@ server.get('/', function (request, reply) {
   reply.send({ hello: 'world' })
 })
 
-
 server.register(jwtPlogin)
 server.register(authRoutes)
 server.register(usersPlogin)
@@ -34,7 +33,7 @@ async function startServer() {
     try {
         await server.listen({port});
         console.log("Server is running on port 3000");
-        prisma.$connect()
+        await prisma.$connect()
         console.log('Connected to postgreSql DB through prisma');
     } catch (error) {
         console.error("Error starting server:", error);
