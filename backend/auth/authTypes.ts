@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyRequest,  FastifyReply } from "fastify";
+import type { FastifyRequest, FastifyReply } from "fastify";
 import "@fastify/jwt";
 
 
