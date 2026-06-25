@@ -12,7 +12,7 @@ import {prisma} from './db/dbConn.js'
 
 const server = Fastify({logger: false});
 
-const port = Number(env.serverPort || 3000)
+const port = Number(env.serverPort)
 server.register(cors, {
     origin: 'http://localhost:5173',
     methods:['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
@@ -32,7 +32,7 @@ server.register(itemsPlogin)
 async function startServer() {
     try {
         await server.listen({port});
-        console.log("Server is running on port 3000");
+        console.log(`Server is running on port ${port}`);
         await prisma.$connect()
         console.log('Connected to postgreSql DB through prisma');
     } catch (error) {
