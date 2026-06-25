@@ -3,6 +3,7 @@ import type { User } from "./usersTypes.js";
 import bcrypt from "bcrypt";
 import { prisma } from "../db/dbConn.js";
 import { env } from "../config/env.js";
+import { masseges } from "../massegas.js";
 
 export default async function usersPlogin(fastify: FastifyInstance) {
   fastify.post<{ Body: Omit<User, "id"> }>(
@@ -26,7 +27,7 @@ export default async function usersPlogin(fastify: FastifyInstance) {
       });
 
       if (user) {
-        return reply.status(400).send({ message: "User already exists" });
+        return reply.status(400).send({ message: masseges.USER_ALREADY_EXISTS });
       }
 
       const salt = await bcrypt.genSalt(env.saltRounds);
@@ -43,7 +44,7 @@ export default async function usersPlogin(fastify: FastifyInstance) {
       reply
         .status(201)
         .send({
-          massage: "user created",
+          massage: masseges.USER_CREATED,
           user: { id: newUser.id, username: newUser.username },
         });
     },
