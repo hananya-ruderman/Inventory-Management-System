@@ -1,6 +1,7 @@
 import { register } from "../../api/registerApi";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import logger from "../../utils/logging";
 import {
   Box,
   Paper,
@@ -29,10 +30,10 @@ export default function Register() {
       navigate("/login");
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Registration failed:", error.message);
+        logger.warn("Registration failed:", error.message);
         alert(`Registration failed: ${error.message}`);
       } else {
-        console.error("Registration failed:", error);
+        logger.warn("Registration failed:", error);
         alert("Registration failed: An unknown error occurred");
       }
     }

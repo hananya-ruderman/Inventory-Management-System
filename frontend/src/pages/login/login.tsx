@@ -3,6 +3,7 @@ import { login } from "../../api/loginApi";
 import { useNavigate } from "react-router";
 import "./login.css";
 import { useUser } from "../../state/user";
+import logger from '../../utils/logging'
 import {
   Box,
   Paper,
@@ -32,10 +33,10 @@ export default function Login() {
       navigate("/dashboard");
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Login failed:", error.message);
+        logger.warn("Login failed:", error.message);
         setError(error);
       } else {
-        console.error("Login failed:", error);
+        logger.warn("Login failed:", error);
         setError(new Error("An unknown error occurred"));
       }
     }

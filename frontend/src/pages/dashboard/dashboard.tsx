@@ -6,6 +6,7 @@ import { useNavigate } from "react-router";
 import { fetchItems } from "../../api/dataApi";
 import type { Item } from "../../models/types";
 import Model from "../../components/model/Model";
+import logger from '../../utils/logging'
 import {
   AppBar,
   Toolbar,
@@ -59,7 +60,7 @@ export default function Dashboard() {
       const items = await fetchItems();
       setData(items);
     } catch (error) {
-      console.error("Failed to fetch items:", error);
+      logger.warn("Failed to fetch items:", error);
     }
   }
 

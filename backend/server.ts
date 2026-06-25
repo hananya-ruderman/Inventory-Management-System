@@ -6,6 +6,7 @@ import authRoutes from "./auth/loginPlogin.js";
 import jwtPlogin from "./auth/jwtPlogin.js";
 import usersPlogin from "./users/usersPlogin.js";
 import { prisma } from "./db/dbConn.js";
+import {logger} from './utils/logging.js'
 
 const server = Fastify({ logger: false });
 
@@ -23,11 +24,11 @@ server.register(itemsPlogin);
 async function startServer() {
   try {
     await server.listen({ port });
-    console.log(`Server is running on port ${port}`);
+    logger.warn(`Server is running on port ${port}`);
     await prisma.$connect();
-    console.log("Connected to postgreSql DB through prisma");
+    logger.warn("Connected to postgreSql DB through prisma");
   } catch (error) {
-    console.error("Error starting server:", error);
+    logger.error("Error starting server:", error);
   }
 }
 
