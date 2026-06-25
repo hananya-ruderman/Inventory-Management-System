@@ -16,11 +16,13 @@ export default async function usersPlogin(fastify: FastifyInstance) {
           properties: {
             username: { type: "string" },
             password: { type: "string" },
+            role: { type: "string"}
           },
         },
       },
     },
     async (request, reply) => {
+      
       const { username, password, role } = request.body;
       const user = await prisma.user.findUnique({
         where: { username },
