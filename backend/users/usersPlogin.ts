@@ -21,7 +21,6 @@ export default async function usersPlogin(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const { username, password, role } = request.body;
-
       const user = await prisma.user.findUnique({
         where: { username },
       });

@@ -16,7 +16,6 @@ import { useState } from "react";
 type setData = React.Dispatch<React.SetStateAction<Item[]>>;
 
 export function Table({ data, setData }: { data: Item[]; setData: setData }) {
-  console.log(data);
   const [editRow, setEditRow] = useState<Item["id"] | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
