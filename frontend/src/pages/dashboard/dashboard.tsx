@@ -105,7 +105,7 @@ export default function Dashboard() {
       <Drawer
         variant="permanent"
         sx={{
-          width: 240,
+          width:240,
           flexShrink: 0,
 
           "& .MuiDrawer-paper": {
@@ -160,7 +160,6 @@ export default function Dashboard() {
           open={isOpen}
           onClose={() => setIsOpen(false)}
           maxWidth="sm"
-          fullWidth
         >
           <Model setIsOpen={setIsOpen} onSuccess={loadData} />
         </Dialog>
