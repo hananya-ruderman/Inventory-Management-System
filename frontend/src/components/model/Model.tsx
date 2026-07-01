@@ -16,30 +16,39 @@ type status = "idle" | "loading" | "success" | "error";
 
 export default function Model({
   setIsOpen,
+  onSuccess,
 }: {
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
+  onSuccess: () => void;
 }) {
   const [name, setName] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<string | null>(null);
   const [status, setStatus] = useState<status>("idle");
   const [isRequired, setIsRequired] = useState<boolean>(false);
-
   async function handleSave() {
     if (!name || !price) {
       setIsRequired(true);
       return;
     }
+
     setIsRequired(false);
     setStatus("loading");
-    const newItem = { name, price: +price, quantity: quantity ? +quantity : 0 };
+
+    const newItem = {
+      name,
+      price: +price,
+      quantity: quantity ? +quantity : 0,
+    };
 
     try {
       await addItem(newItem);
+
       setStatus("success");
+
       setTimeout(() => {
+        onSuccess();
         setIsOpen(false);
-      
       }, 2000);
     } catch (error) {
       setStatus("error");
@@ -49,7 +58,6 @@ export default function Model({
       }, 2000);
     }
   }
-
   return (
     <Box
       sx={{

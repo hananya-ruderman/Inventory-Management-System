@@ -22,6 +22,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUser();
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [refresh, setRefresh] = useState(0);
 
   useEffect(() => {
     if (currentUser) {
@@ -131,11 +132,13 @@ export default function Dashboard() {
           onClose={() => setIsOpen(false)}
           maxWidth="sm"
         >
-          <Model setIsOpen={setIsOpen}/>
+          <Model
+  setIsOpen={setIsOpen}
+  onSuccess={() => setRefresh(prev => prev + 1)}
+/>
         </Dialog>
 
-        <Table />
-      </Box>
+<Table refresh={refresh}/>      </Box>
     </Box>
   );
 }
