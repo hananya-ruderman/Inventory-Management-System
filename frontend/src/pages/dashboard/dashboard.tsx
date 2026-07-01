@@ -3,10 +3,7 @@ import { useUser } from "../../state/user";
 import { Table } from "../../components/table/table";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { fetchItems } from "../../api/dataApi";
-import type { Item } from "../../models/types";
 import Model from "../../components/model/Model";
-import logger from '../../utils/logging'
 import {
   AppBar,
   Toolbar,
@@ -17,7 +14,6 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  TextField,
   Button,
   Dialog,
 } from "@mui/material";
@@ -25,8 +21,6 @@ import {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUser();
-  const [data, setData] = useState<Item[]>([]);
-  const [filteredData, setFilteredData] = useState<Item[] | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   useEffect(() => {
@@ -38,32 +32,15 @@ export default function Dashboard() {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
+  
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/login");
   }
 
-  function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
-    const query = event.target.value;
-    const searchedData = data.filter((item: Item) => {
-      return item.name.includes(query);
-    });
-    setFilteredData(searchedData);
-  }
+  
 
-  async function loadData() {
-    try {
-      const items = await fetchItems();
-      setData(items);
-    } catch (error) {
-      logger.warn("Failed to fetch items:", error);
-    }
-  }
-
+  
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <AppBar position="fixed">
@@ -82,14 +59,7 @@ export default function Dashboard() {
             Welcome, {currentUser}!
           </Typography>
 
-          <TextField
-            placeholder="Search..."
-            onChange={handleSearch}
-            sx={{
-              backgroundColor: "background.default",
-              borderRadius: 1,
-            }}
-          />
+          
 
           <Button
             variant="contained"
@@ -161,10 +131,10 @@ export default function Dashboard() {
           onClose={() => setIsOpen(false)}
           maxWidth="sm"
         >
-          <Model setIsOpen={setIsOpen} onSuccess={loadData} />
+          <Model setIsOpen={setIsOpen}/>
         </Dialog>
 
-        <Table data={filteredData ?? data} setData={setData} />
+        <Table />
       </Box>
     </Box>
   );
