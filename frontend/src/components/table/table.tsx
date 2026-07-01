@@ -15,15 +15,15 @@ import {
   Stack,
 } from "@mui/material";
 
-export function Table() {
+export function Table({ refresh }: { refresh: number }) {
   const [data, setData] = useState<Item[]>([]);
   const [search, setSearch] = useState("");
   const [editRow, setEditRow] = useState<Item["id"] | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   useEffect(() => {
-    loadData();
-  }, []);
+  loadData();
+}, [refresh]);
 
   async function loadData() {
     try {
@@ -53,20 +53,20 @@ export function Table() {
   }
 
   async function handleSave() {
-  if (!editingItem) return;
+    if (!editingItem) return;
 
-  try {
-    await editItem(editingItem.id, editingItem);
+    try {
+      await editItem(editingItem.id, editingItem);
 
-    const updatedData = await fetchItems();
-    setData(updatedData);
+      const updatedData = await fetchItems();
+      setData(updatedData);
 
-    setEditRow(null);
-    setEditingItem(null);
-  } catch (error) {
-    logger.warn("Failed to edit item:", error);
+      setEditRow(null);
+      setEditingItem(null);
+    } catch (error) {
+      logger.warn("Failed to edit item:", error);
+    }
   }
-}
 
   async function handleDelete(row: Item) {
     try {
