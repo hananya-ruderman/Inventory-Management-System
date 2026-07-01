@@ -53,21 +53,20 @@ export function Table() {
   }
 
   async function handleSave() {
-    if (!editingItem) return;
+  if (!editingItem) return;
 
-    try {
-      await editItem(editingItem.id, editingItem);
+  try {
+    await editItem(editingItem.id, editingItem);
 
-      const updatedData = await fetchItems();
+    const updatedData = await fetchItems();
+    setData(updatedData);
 
-      setData(updatedData);
-
-      setEditRow(null);
-      setEditingItem(null);
-    } catch (error) {
-      logger.warn("Failed to edit item:", error);
-    }
+    setEditRow(null);
+    setEditingItem(null);
+  } catch (error) {
+    logger.warn("Failed to edit item:", error);
   }
+}
 
   async function handleDelete(row: Item) {
     try {
