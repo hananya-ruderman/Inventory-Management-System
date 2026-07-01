@@ -34,7 +34,11 @@ async function startServer() {
         await server.listen({port});
         console.log(`Server is running on port ${port}`);
         await prisma.$connect()
+        console.log(process.env.DATABASE_URL)
         console.log('Connected to postgreSql DB through prisma');
+        await prisma.$queryRaw`SELECT 1`
+
+console.log("DB really works")
     } catch (error) {
         console.error("Error starting server:", error);
     }
