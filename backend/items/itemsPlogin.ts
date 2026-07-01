@@ -8,9 +8,14 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
-    const data = await prisma.item.findMany();
-    reply.send(data);
+  const data = await prisma.item.findMany({
+    orderBy: {
+      id: "asc",
+    },
   });
+
+  reply.send(data);
+});
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
     "/items",
