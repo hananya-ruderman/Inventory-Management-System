@@ -8,9 +8,14 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
-    const data = await prisma.item.findMany();
-    reply.send(data);
+  const data = await prisma.item.findMany({
+    orderBy: {
+      id: "asc",
+    },
   });
+
+  reply.send(data);
+});
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
     "/items",
@@ -21,21 +26,21 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           required: ["name", "price"],
           properties: {
             name: { type: "string" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
             price: { type: "number" },
           },
         },
       },
     },
     async (request, reply) => {
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
       const { id } = request.user;
 
       const newItem = await prisma.item.create({
         data: {
           name,
           price,
-          stock: quantity || 1,
+          stock: stock || 1,
           sku: randomUUID(),
           createdBy: {
             connect: {
@@ -66,7 +71,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           properties: {
             name: { type: "string" },
             price: { type: "number" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
           },
         },
       },
@@ -74,7 +79,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     async (request, reply) => {
       const id = Number(request.params.id);
 
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
 
       const item = await prisma.item.findUnique({
         where: { id },
@@ -89,7 +94,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         data: {
           name,
           price,
-          stock: quantity || 1,
+          stock: stock || 1,
         },
       });
 
@@ -102,7 +107,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     Body: Partial<{
       name: string;
       price: number;
-      quantity: number;
+      stock: number;
     }>;
   }>(
     "/items/:id",
@@ -120,12 +125,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           properties: {
             name: { type: "string" },
             price: { type: "number" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
           },
           anyOf: [
             { required: ["name"] },
             { required: ["price"] },
-            { required: ["quantity"] },
+            { required: ["stock"] },
           ],
         },
       },
@@ -133,12 +138,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     async (request, reply) => {
       const id = Number(request.params.id);
 
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
 
       const data = {
         ...(name !== undefined && { name }),
         ...(price !== undefined && { price }),
-        ...(quantity !== undefined && { stock: quantity }),
+        ...(stock !== undefined && { stock }),
       };
 
       try {
