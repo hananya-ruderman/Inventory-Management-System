@@ -1,7 +1,7 @@
 import type { Item } from "../../models/types";
 import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
 import { useState } from "react";
- import {
+import {
   Paper,
   Table as MuiTable,
   TableHead,
@@ -44,81 +44,80 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
   }
 
   async function handleDelete(row: Item) {
-    await deleteItem(row.id)
-    const fetchedItems = await fetchItems()
-    setData(fetchedItems)
+    await deleteItem(row.id);
+    const fetchedItems = await fetchItems();
+    setData(fetchedItems);
   }
 
   if (!Array.isArray(data) || data.length === 0) {
     return <p>No data available</p>;
   }
 
-
-
-return (
-  <Paper elevation={3}>
-    <MuiTable>
-      <TableHead>
-        <TableRow>
-          {Object.keys(data[0]).map((key) => (
-            <TableCell key={key}>{key}</TableCell>
-          ))}
-          <TableCell>Actions</TableCell>
-        </TableRow>
-      </TableHead>
-
-      <TableBody>
-        {data.map((row) => (
-          <TableRow key={row.id as string | number}>
-            {Object.entries(row).map(([key, value]) => {
-              const itemKey = key as keyof Item;
-
-              return (
-                <TableCell key={key}>
-                  {editRow === row.id ? (
-                    <TextField
-                      size="small"
-                      name={itemKey}
-                      value={editingItem?.[itemKey] ?? ""}
-                      onChange={handleChange}
-                    />
-                  ) : (
-                    value
-                  )}
-                </TableCell>
-              );
-            })}
-
-            <TableCell>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleEdit(row)}
-                >
-                  Edit
-                </Button>
-
-                {editRow === row.id && (
-                  <Button
-                    variant="contained"
-                    onClick={handleSave}
-                  >
-                    Save
-                  </Button>
-                )}
-
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => handleDelete(row)}
-                >
-                  Delete
-                </Button>
-              </Stack>
-            </TableCell>
+  return (
+    <Paper elevation={3}>
+      <MuiTable>
+        <TableHead>
+          <TableRow>
+            {Object.keys(data[0]).map((key) => (
+              <TableCell key={key}>{key}</TableCell>
+            ))}
+            <TableCell>Actions</TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </MuiTable>
-  </Paper>
-)};
+        </TableHead>
+
+        <TableBody>
+          {data.map((row) => (
+            <TableRow key={row.id as string | number}>
+              {Object.entries(row).map(([key, value]) => {
+                const itemKey = key as keyof Item;
+
+                return (
+                  <TableCell key={key}>
+                    {editRow === row.id ? (
+                      key !== "name" && key !== "price" && key !== "stock" ? (
+                        value
+                      ) : (
+                        <TextField
+                          size="small"
+                          name={key}
+                          value={editingItem?.[itemKey] ?? ""}
+                          onChange={handleChange}
+                        />
+                      )
+                    ) : (
+                      value
+                    )}
+                  </TableCell>
+                );
+              })}
+
+              <TableCell>
+                <Stack direction="row" spacing={1}>
+                  {editRow !== row.id && (
+                    <Button variant="outlined" onClick={() => handleEdit(row)}>
+                      Edit
+                    </Button>
+                  )}
+
+                  {editRow === row.id && (
+                    <Button variant="contained" onClick={handleSave}>
+                      Save
+                    </Button>
+                  )}
+
+                  <Button
+                    color="error"
+                    variant="outlined"
+                    onClick={() => handleDelete(row)}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </MuiTable>
+    </Paper>
+  );
+}
