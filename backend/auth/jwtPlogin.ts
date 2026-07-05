@@ -1,7 +1,7 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
 import fastifyJwt from "@fastify/jwt";
-import { masseges } from "../massegas.js";
+import { masseges } from "../messages.js";
 
 export default fp(async (fastify: FastifyInstance) => {
   fastify.register(fastifyJwt, {

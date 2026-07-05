@@ -3,7 +3,7 @@ import type { User } from "./usersTypes.js";
 import bcrypt from "bcrypt";
 import { prisma } from "../db/dbConn.js";
 import { env } from "../config/env.js";
-import { masseges } from "../massegas.js";
+import { masseges } from "../messages.js";
 
 export default async function usersPlogin(fastify: FastifyInstance) {
   fastify.post<{ Body: Omit<User, "id"> }>(
