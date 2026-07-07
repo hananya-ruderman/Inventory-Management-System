@@ -7,7 +7,7 @@ import jwtPlogin from "./auth/jwtPlogin.js";
 import usersPlogin from "./users/usersPlogin.js";
 import { logger } from "./utils/logging.js";
 import { connectDatabase } from "./db/dbConn.js";
-import webSocketPlogin from "./utils/webSocketPlogin.js";
+import webSocketPlogin from "./raeltime/websocketPlogin.js";
 
 const server = Fastify({ logger: false });
 
