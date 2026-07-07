@@ -7,6 +7,7 @@ import jwtPlogin from "./auth/jwtPlogin.js";
 import usersPlogin from "./users/usersPlogin.js";
 import { logger } from "./utils/logging.js";
 import { connectDatabase } from "./db/dbConn.js";
+import webSocketPlogin from "./utils/websocketPlogin.js";
 
 const server = Fastify({ logger: false });
 
@@ -16,6 +17,7 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
+server.register(webSocketPlogin)
 server.register(jwtPlogin);
 server.register(authRoutes);
 server.register(usersPlogin);
