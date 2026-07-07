@@ -17,6 +17,7 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
+
 server.register(webSocketPlogin)
 server.register(jwtPlogin);
 server.register(authRoutes);

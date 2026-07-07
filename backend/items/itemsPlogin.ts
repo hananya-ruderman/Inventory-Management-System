@@ -8,14 +8,14 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
-  const data = await prisma.item.findMany({
-    orderBy: {
-      id: "asc",
-    },
-  });
+    const data = await prisma.item.findMany({
+      orderBy: {
+        id: "asc",
+      },
+    });
 
-  reply.send(data);
-});
+    reply.send(data);
+  });
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
     "/items",
@@ -48,6 +48,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
             },
           },
         },
+      });
+
+      fastify.websocketManager.broadcast({
+        type: "inventoryChanged",
+        action: "create",
+        item: newItem,
       });
 
       reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
@@ -96,6 +102,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           price,
           stock: stock || 1,
         },
+      });
+
+      fastify.websocketManager.broadcast({
+        type: "inventoryChanged",
+        action: "update",
+        item: updatedItem,
       });
 
       reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
@@ -152,6 +164,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           data,
         });
 
+        fastify.websocketManager.broadcast({
+          type: "inventoryChanged",
+          action: "update",
+          item: updatedItem,
+        });
+
         return reply.status(200).send({
           message: masseges.UPDATE_SUCCESS,
           item: updatedItem,
@@ -188,6 +206,11 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           where: { id },
         });
 
+        fastify.websocketManager.broadcast({
+          type: "inventoryChanged",
+          action: "delete",
+          item: deletedItem,
+        });
         return reply.status(200).send({
           message: masseges.ITEM_DELETED,
           item: deletedItem,

@@ -12,17 +12,15 @@ export default fp(async (fastify) => {
   fastify.get("/ws", { websocket: true }, (socket, req) => {
     logger.info("client connected");
 
-    socket.on("message", (message) => {
-      websocketManager.broadcast({
-        text: message.toString(),
-      });
-    });
-
     websocketManager.addClient(socket);
 
     socket.on("close", () => {
       logger.info("client disconnected");
 
+      websocketManager.removeClient(socket);
+    });
+
+    socket.on("error", () => {
       websocketManager.removeClient(socket);
     });
   });
