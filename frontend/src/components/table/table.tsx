@@ -1,5 +1,6 @@
 import type { Item } from "../../models/types";
 import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
+import { connectSocket } from "../../api/socket";
 import { useState, useEffect } from "react";
 import logger from "../../utils/logging";
 
@@ -22,8 +23,14 @@ export function Table({ refresh }: { refresh: number }) {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   useEffect(() => {
-  loadData();
-}, [refresh]);
+    loadData();
+
+    connectSocket((message) => {
+      if (message.type === "inventoryChanged") {
+        loadData();
+      }
+    });
+  }, [refresh]);
 
   async function loadData() {
     try {
