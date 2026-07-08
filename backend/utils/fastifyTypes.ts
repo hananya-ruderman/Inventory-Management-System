@@ -1,4 +1,4 @@
-import type { createWebsocketManager } from "../raeltime/webSocketManager.js";
+import type { createWebsocketManager } from "../raeltime/websocketManager.js";
 
 declare module "fastify" {
   interface FastifyInstance {

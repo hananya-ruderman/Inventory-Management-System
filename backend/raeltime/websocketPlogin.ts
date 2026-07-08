@@ -1,5 +1,5 @@
 import fp from "fastify-plugin";
-import { createWebsocketManager } from "./webSocketManager.js";
+import { createWebsocketManager } from "./websocketManager.js";
 import websocket from "@fastify/websocket";
 import { logger } from "../utils/logging.js";
 
