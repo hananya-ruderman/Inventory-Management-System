@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import type { User } from "../users/usersTypes.ts";
 import bcrypt from 'bcrypt'
 import {prisma} from '../db/dbConn.js'
-import { messages } from "../messages.js";
+import { messages } from "../messagas.js";
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Pick<User, "username" | "password"> }>(

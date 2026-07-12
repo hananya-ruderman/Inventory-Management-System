@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { prisma } from "../db/dbConn.js";
 import type { Item } from "./itemsTypes.ts";
 import { randomUUID } from "crypto";
-import { messages } from "../messages.js";
+import { messages } from "../messagas.js";
 
 export default async function itemsPlogin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);

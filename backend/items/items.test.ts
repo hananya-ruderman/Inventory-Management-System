@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import itemsPlugin from "./itemsPlogin.js";
 import { prisma } from "../db/dbConn.js";
-import { messages } from "../messages.js";
+import { messages } from "../messagas.js";
 import { beforeEach } from "vitest";
 
 beforeEach(() => {
