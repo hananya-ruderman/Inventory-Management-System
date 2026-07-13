@@ -2,6 +2,13 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach } from "vitest";
 import { buildServer } from "../server/server.js";
 import { prisma } from "../db/dbConn.js";
 import type { FastifyInstance } from "fastify";
+import { messages } from "../messagas.js";
+
+type JwtPayload = {
+  id: number;
+  username: string;
+  role: string;
+};
 
 let server!: FastifyInstance;
 
@@ -76,5 +83,53 @@ describe("item integration", () => {
     });
 
     expect(item).not.toBeNull();
+  });
+
+  it("should return 401 when creating item without token", async () => {
+    const response = await server.inject({
+      method: "POST",
+      url: "/items",
+      payload: {
+        name: "Laptop",
+        price: 5000,
+        stock: 10,
+      },
+    });
+
+    expect(response.statusCode).toBe(401);
+
+    expect(response.json()).toEqual({
+      message: messages.UNAUTHENTICATED,
+    });
+  });
+
+  it("should return a valid token after login", async () => {
+    await server.inject({
+      method: "POST",
+      url: "/users",
+      payload: {
+        username: "moshe",
+        password: "1234",
+        role: "user",
+      },
+    });
+
+    const response = await server.inject({
+      method: "POST",
+      url: "/login",
+      payload: {
+        username: "moshe",
+        password: "1234",
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+
+    const body = response.json();
+
+    const payload = server.jwt.verify<JwtPayload>(body.token);
+
+    expect(payload.username).toBe("moshe");
+    expect(payload.role).toBe("user");
   });
 });
