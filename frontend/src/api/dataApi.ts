@@ -1,8 +1,8 @@
 import api from "./apiConfig";
 import type { Item } from "../models/types";
 
-export async function fetchItems() {
-    const response = await api.get('/items');
+export async function fetchItems(signal?: AbortSignal) {
+    const response = await api.get('/items', {signal});
     return response.data;
 }
 

@@ -2,6 +2,7 @@ import type { Item } from "../../models/types";
 import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
 import { useState, useEffect } from "react";
 import logger from "../../utils/logging";
+import axios from "axios";
 
 import {
   Paper,
@@ -22,14 +23,24 @@ export function Table({ refresh }: { refresh: number }) {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   useEffect(() => {
-    loadData();
+    const controller = new AbortController();
+
+    loadData(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, [refresh]);
 
-  async function loadData() {
+  async function loadData(signal: AbortSignal) {
     try {
-      const items = await fetchItems();
+      const items = await fetchItems(signal);
       setData(items);
     } catch (error) {
+      if (axios.isCancel(error)) {
+        return;
+      }
+
       logger.warn("Failed to fetch items:", error);
     }
   }
@@ -78,7 +89,6 @@ export function Table({ refresh }: { refresh: number }) {
       const { item } = updatedRes;
 
       setData((prev) => prev.filter((i) => i.id !== item.id));
-      
     } catch (error) {
       logger.warn("Failed to delete item:", error);
     }
