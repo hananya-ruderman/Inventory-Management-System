@@ -1,5 +1,6 @@
 import { useState, type SetStateAction } from "react";
 import { addItem } from "../../api/dataApi";
+import { STATUS, MESSAGESE, FORM_FIELDS, FORM_LABELS} from "../../utils/messagese";
 
 import {
   Box,
@@ -12,7 +13,8 @@ import {
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
-type status = "idle" | "loading" | "success" | "error";
+
+type Status = (typeof STATUS)[keyof typeof STATUS];
 
 export default function Model({
   setIsOpen,
@@ -24,8 +26,9 @@ export default function Model({
   const [name, setName] = useState<string | null>(null);
   const [price, setPrice] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<string | null>(null);
-  const [status, setStatus] = useState<status>("idle");
+  const [status, setStatus] = useState<Status>(STATUS.IDLE);
   const [isRequired, setIsRequired] = useState<boolean>(false);
+
   async function handleSave() {
     if (!name || !price) {
       setIsRequired(true);
@@ -33,7 +36,7 @@ export default function Model({
     }
 
     setIsRequired(false);
-    setStatus("loading");
+    setStatus(STATUS.LOADING);
 
     const newItem = {
       name,
@@ -44,14 +47,14 @@ export default function Model({
     try {
       await addItem(newItem);
 
-      setStatus("success");
+      setStatus(STATUS.SUCCESS);
 
       setTimeout(() => {
         onSuccess();
         setIsOpen(false);
       }, 2000);
     } catch (error) {
-      setStatus("error");
+      setStatus(STATUS.ERROR);
 
       setTimeout(() => {
         setIsOpen(false);
@@ -65,7 +68,7 @@ export default function Model({
         width: 400,
       }}
     >
-      {status === "idle" && (
+      {status === STATUS.IDLE && (
         <Stack spacing={2}>
           <Box
             sx={{
@@ -74,7 +77,7 @@ export default function Model({
               alignItems: "center",
             }}
           >
-            <Typography variant="h5">New Item</Typography>
+            <Typography variant="h5">{MESSAGESE.ITEM.NEW_ITEM}</Typography>
 
             <IconButton onClick={() => setIsOpen(false)}>
               <CloseIcon />
@@ -82,28 +85,32 @@ export default function Model({
           </Box>
 
           <TextField
-            label="Name"
+            label={FORM_LABELS.ITEM.NAME}
             required
-            name="name"
+            name={FORM_FIELDS.ITEM.NAME}
             value={name}
             onChange={(e) => setName(e.target.value)}
             error={isRequired && !name}
-            helperText={isRequired && !name ? "Name is required" : ""}
+            helperText={
+              isRequired && !name ? MESSAGESE.VALIDATION.NAME_REQUIRED : ""
+            }
           />
 
           <TextField
-            label="Price"
+            label={FORM_LABELS.ITEM.PRICE}
             required
-            name="price"
+            name={FORM_FIELDS.ITEM.PRICE}
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             error={isRequired && !price}
-            helperText={isRequired && !price ? "Price is required" : ""}
+            helperText={
+              isRequired && !price ? MESSAGESE.VALIDATION.PRICE_REQUIRED : ""
+            }
           />
 
           <TextField
-            label="Quantity"
-            name="quantity"
+            label={FORM_LABELS.ITEM.QUANTITY}
+            name={FORM_FIELDS.ITEM.QUANTITY}
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
           />
@@ -114,14 +121,16 @@ export default function Model({
         </Stack>
       )}
 
-      {status === "loading" && <Alert severity="info">Adding item...</Alert>}
-
-      {status === "success" && (
-        <Alert severity="success">Item added successfully</Alert>
+      {status === STATUS.LOADING && (
+        <Alert severity="info">{MESSAGESE.ITEM.ADDING}</Alert>
       )}
 
-      {status === "error" && (
-        <Alert severity="error">Error in adding item</Alert>
+      {status === STATUS.SUCCESS && (
+        <Alert severity="success">{MESSAGESE.ITEM.ADDED_SUCCESSFULLY}</Alert>
+      )}
+
+      {status === STATUS.ERROR && (
+        <Alert severity="error">{MESSAGESE.ITEM.ADD_ERROR}</Alert>
       )}
     </Box>
   );
