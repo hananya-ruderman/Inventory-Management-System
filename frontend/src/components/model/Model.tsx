@@ -5,7 +5,7 @@ import {
   MESSAGESE,
   FORM_FIELDS,
   FORM_LABELS,
-} from "../../utils/messagese";
+} from "../../utils/messages";
 
 import {
   Box,

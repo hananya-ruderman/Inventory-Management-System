@@ -22,8 +22,8 @@ export function Table({ refresh }: { refresh: number }) {
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
   useEffect(() => {
-  loadData();
-}, [refresh]);
+    loadData();
+  }, [refresh]);
 
   async function loadData() {
     try {
@@ -56,10 +56,13 @@ export function Table({ refresh }: { refresh: number }) {
     if (!editingItem) return;
 
     try {
-      await editItem(editingItem.id, editingItem);
+      const updatedRes = await editItem(editingItem.id, editingItem);
 
-      const updatedData = await fetchItems();
-      setData(updatedData);
+      const { updatedItem } = updatedRes;
+
+      setData((prev) =>
+        prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
+      );
 
       setEditRow(null);
       setEditingItem(null);
@@ -70,11 +73,11 @@ export function Table({ refresh }: { refresh: number }) {
 
   async function handleDelete(row: Item) {
     try {
-      await deleteItem(row.id);
+      const updatedRes = await deleteItem(row.id);
 
-      const updatedData = await fetchItems();
+      const { item } = updatedRes;
 
-      setData(updatedData);
+      setData((prev) => prev.filter((i) => i.id !== item.id));
     } catch (error) {
       logger.warn("Failed to delete item:", error);
     }
