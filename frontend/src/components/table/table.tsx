@@ -78,6 +78,7 @@ export function Table({ refresh }: { refresh: number }) {
       const { item } = updatedRes;
 
       setData((prev) => prev.filter((i) => i.id !== item.id));
+      
     } catch (error) {
       logger.warn("Failed to delete item:", error);
     }
@@ -87,7 +88,7 @@ export function Table({ refresh }: { refresh: number }) {
     setSearch(event.target.value);
   }
 
-  if (!data.length) {
+  if (!Array.isArray(data) || !Array.length || data[0] === undefined) {
     return <p>No data available</p>;
   }
 
