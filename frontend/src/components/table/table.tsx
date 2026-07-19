@@ -59,10 +59,6 @@ export function InventoryTable({ data, onDelete, onUpdate }: Props) {
     [data, search],
   );
 
-  if (!data.length) {
-    return <p>No data available</p>;
-  }
-
   return (
     <Paper
       elevation={2}
@@ -112,111 +108,119 @@ export function InventoryTable({ data, onDelete, onUpdate }: Props) {
         </TableHead>
 
         <TableBody>
-          {tableData.map((row) => (
-            <TableRow
-              key={row.id}
-              hover
-              sx={{
-                "&:last-child td, &:last-child th": {
-                  border: 0,
-                },
-                ...(editRow === row.id && {
-                  backgroundColor: "action.hover",
-                }),
-              }}
-            >
-              <TableCell
+          {tableData.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No data available
+              </TableCell>
+            </TableRow>
+          ) : (
+            tableData.map((row) => (
+              <TableRow
+                key={row.id}
+                hover
                 sx={{
-                  width: "30%",
-                  fontWeight: 500,
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                  ...(editRow === row.id && {
+                    backgroundColor: "action.hover",
+                  }),
                 }}
               >
-                {editRow === row.id ? (
-                  <TextField
-                    size="small"
-                    fullWidth
-                    name="name"
-                    value={editingItem?.name ?? ""}
-                    onChange={handleChange}
-                  />
-                ) : (
-                  row.name
-                )}
-              </TableCell>
-
-              <TableCell align="center" sx={{ width: "20%" }}>
-                {editRow === row.id ? (
-                  <TextField
-                    size="small"
-                    type="number"
-                    name="price"
-                    value={editingItem?.price ?? ""}
-                    onChange={handleChange}
-                  />
-                ) : (
-                  `₪${row.price}`
-                )}
-              </TableCell>
-
-              <TableCell align="center" sx={{ width: "20%" }}>
-                {editRow === row.id ? (
-                  <TextField
-                    size="small"
-                    type="number"
-                    name="quantity"
-                    value={editingItem?.quantity ?? ""}
-                    onChange={handleChange}
-                  />
-                ) : (
-                  row.quantity
-                )}
-              </TableCell>
-
-              <TableCell
-                align="center"
-                sx={{
-                  width: "30%",
-                }}
-              >
-                <Stack
+                <TableCell
                   sx={{
-                    justifyContent: "center",
+                    width: "30%",
+                    fontWeight: 500,
                   }}
-                  direction="row"
-                  spacing={1}
                 >
-                  {editRow !== row.id && (
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      fullWidth
+                      name="name"
+                      value={editingItem?.name ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    row.name
+                  )}
+                </TableCell>
+
+                <TableCell align="center" sx={{ width: "20%" }}>
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      type="number"
+                      name="price"
+                      value={editingItem?.price ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    `₪${row.price}`
+                  )}
+                </TableCell>
+
+                <TableCell align="center" sx={{ width: "20%" }}>
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      type="number"
+                      name="quantity"
+                      value={editingItem?.quantity ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    row.quantity
+                  )}
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    width: "30%",
+                  }}
+                >
+                  <Stack
+                    sx={{
+                      justifyContent: "center",
+                    }}
+                    direction="row"
+                    spacing={1}
+                  >
+                    {editRow !== row.id && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleEdit(row)}
+                      >
+                        Edit
+                      </Button>
+                    )}
+
+                    {editRow === row.id && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={handleSave}
+                      >
+                        Save
+                      </Button>
+                    )}
+
                     <Button
                       size="small"
                       variant="outlined"
-                      onClick={() => handleEdit(row)}
+                      color="error"
+                      onClick={() => onDelete(row)}
                     >
-                      Edit
+                      Delete
                     </Button>
-                  )}
-
-                  {editRow === row.id && (
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={handleSave}
-                    >
-                      Save
-                    </Button>
-                  )}
-
-                  <Button
-                    size="small"
-                    variant="outlined"
-                    color="error"
-                    onClick={() => onDelete(row)}
-                  >
-                    Delete
-                  </Button>
-                </Stack>
-              </TableCell>
-            </TableRow>
-          ))}
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </MuiTable>
     </Paper>
