@@ -15,23 +15,35 @@ import {
   Alert,
 } from "@mui/material";
 
+type RegisterForm = {
+  username: string;
+  password: string;
+  role: "admin" | "user";
+};
+
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "user">("user");
+  const [form, setForm] = useState<RegisterForm>({
+    username: "",
+    password: "",
+    role: "user",
+  });
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   async function handleRegister() {
     setError(null);
 
-    if (!username || !password) {
+    if (!form.username || !form.password) {
       setError("Username and password are required");
       return;
     }
 
     try {
-      await register({ username, password, role });
+      await register({
+        username: form.username,
+        password: form.password,
+        role: form.role,
+      });
       navigate("/login");
     } catch (error) {
       if (error instanceof Error) {
@@ -72,8 +84,13 @@ export default function Register() {
 
         <TextField
           label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={form.username}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              username: e.target.value,
+            }))
+          }
           fullWidth
           margin="normal"
         />
@@ -81,8 +98,13 @@ export default function Register() {
         <TextField
           label="Password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={form.password}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              password: e.target.value,
+            }))
+          }
           fullWidth
           margin="normal"
         />
@@ -91,9 +113,14 @@ export default function Register() {
           <InputLabel>Role</InputLabel>
 
           <Select
-            value={role}
+            value={form.role}
             label="Role"
-            onChange={(e) => setRole(e.target.value as "admin" | "user")}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                role: e.target.value,
+              }))
+            }
           >
             <MenuItem value="user">User</MenuItem>
 
