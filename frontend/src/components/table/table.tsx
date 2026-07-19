@@ -1,8 +1,5 @@
+import { useMemo, useState } from "react";
 import type { Item } from "../../models/types";
-import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
-import { useState, useEffect, useMemo } from "react";
-import logger from "../../utils/logging";
-import axios from "axios";
 
 import {
   Paper,
@@ -16,36 +13,18 @@ import {
   Stack,
 } from "@mui/material";
 
-export function Table({ refresh }: { refresh: number }) {
-  const [data, setData] = useState<Item[]>([]);
+type Props = {
+  data: Item[];
+  onDelete: (item: Item) => void;
+  onUpdate: (item: Item) => void;
+};
+
+export function InventoryTable({ data, onDelete, onUpdate }: Props) {
   const [search, setSearch] = useState("");
-  const [editRow, setEditRow] = useState<Item["id"] | null>(null);
+  const [editRow, setEditRow] = useState<number | string>("");
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
-  useEffect(() => {
-    const controller = new AbortController();
-
-    loadData(controller.signal);
-
-    return () => {
-      controller.abort();
-    };
-  }, [refresh]);
-
-  async function loadData(signal: AbortSignal) {
-    try {
-      const items = await fetchItems(signal);
-      setData(items);
-    } catch (error) {
-      if (axios.isCancel(error)) {
-        return;
-      }
-
-      logger.warn("Failed to fetch items:", error);
-    }
-  }
-
-  async function handleEdit(row: Item) {
+  function handleEdit(row: Item) {
     setEditRow(row.id);
     setEditingItem(row);
   }
@@ -63,39 +42,13 @@ export function Table({ refresh }: { refresh: number }) {
     });
   }
 
-  async function handleSave() {
+  function handleSave() {
     if (!editingItem) return;
 
-    try {
-      const updatedRes = await editItem(editingItem.id, editingItem);
+    onUpdate(editingItem);
 
-      const { updatedItem } = updatedRes;
-
-      setData((prev) =>
-        prev.map((item) => (item.id === updatedItem.id ? updatedItem : item)),
-      );
-
-      setEditRow(null);
-      setEditingItem(null);
-    } catch (error) {
-      logger.warn("Failed to edit item:", error);
-    }
-  }
-
-  async function handleDelete(row: Item) {
-    try {
-      const updatedRes = await deleteItem(row.id);
-
-      const { item } = updatedRes;
-
-      setData((prev) => prev.filter((i) => i.id !== item.id));
-    } catch (error) {
-      logger.warn("Failed to delete item:", error);
-    }
-  }
-
-  function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
-    setSearch(event.target.value);
+    setEditRow("");
+    setEditingItem(null);
   }
 
   const tableData = useMemo(
@@ -106,86 +59,131 @@ export function Table({ refresh }: { refresh: number }) {
     [data, search],
   );
 
-
-  if (!Array.isArray(data) || !Array.length || data[0] === undefined) {
+  if (!data.length) {
     return <p>No data available</p>;
   }
 
-  
   return (
     <Paper
-      elevation={3}
+      elevation={2}
       sx={{
-        borderRadius: 2,
+        borderRadius: 3,
         overflow: "hidden",
       }}
     >
-      <MuiTable>
+      <MuiTable
+        sx={{
+          minWidth: 700,
+        }}
+      >
         <TableHead>
           <TableRow>
-            <TableCell colSpan={Object.keys(data[0]).length + 1} sx={{ py: 1 }}>
+            <TableCell
+              colSpan={4}
+              sx={{
+                backgroundColor: "background.paper",
+                py: 2,
+              }}
+            >
               <Stack
                 direction="row"
                 sx={{
                   justifyContent: "space-between",
-                  alignItems: "center",
                 }}
               >
-                <h3 style={{ margin: 0 }}>Products Table</h3>
+                <h3>Products Table</h3>
 
                 <TextField
                   size="small"
                   placeholder="Search..."
-                  onChange={handleSearch}
-                  sx={{
-                    width: 250,
-                    backgroundColor: "background.default",
-                    borderRadius: 1,
-                  }}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
                 />
               </Stack>
             </TableCell>
           </TableRow>
 
           <TableRow>
-            {Object.keys(data[0]).map((key) => (
-              <TableCell key={key}>{key}</TableCell>
-            ))}
-
+            <TableCell>Name</TableCell>
+            <TableCell align="center">Price</TableCell>
+            <TableCell align="center">Quantity</TableCell>
             <TableCell align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {tableData.map((row) => (
-            <TableRow key={row.id} hover>
-              {Object.entries(row).map(([key, value]) => {
-                const itemKey = key as keyof Item;
+            <TableRow
+              key={row.id}
+              hover
+              sx={{
+                "&:last-child td, &:last-child th": {
+                  border: 0,
+                },
+                ...(editRow === row.id && {
+                  backgroundColor: "action.hover",
+                }),
+              }}
+            >
+              <TableCell
+                sx={{
+                  width: "30%",
+                  fontWeight: 500,
+                }}
+              >
+                {editRow === row.id ? (
+                  <TextField
+                    size="small"
+                    fullWidth
+                    name="name"
+                    value={editingItem?.name ?? ""}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  row.name
+                )}
+              </TableCell>
 
-                return (
-                  <TableCell key={key}>
-                    {editRow === row.id &&
-                    ["name", "price", "stock"].includes(key) ? (
-                      <TextField
-                        size="small"
-                        name={key}
-                        value={editingItem?.[itemKey] ?? ""}
-                        onChange={handleChange}
-                      />
-                    ) : (
-                      value
-                    )}
-                  </TableCell>
-                );
-              })}
+              <TableCell align="center" sx={{ width: "20%" }}>
+                {editRow === row.id ? (
+                  <TextField
+                    size="small"
+                    type="number"
+                    name="price"
+                    value={editingItem?.price ?? ""}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  `₪${row.price}`
+                )}
+              </TableCell>
 
-              <TableCell align="center">
+              <TableCell align="center" sx={{ width: "20%" }}>
+                {editRow === row.id ? (
+                  <TextField
+                    size="small"
+                    type="number"
+                    name="quantity"
+                    value={editingItem?.quantity ?? ""}
+                    onChange={handleChange}
+                  />
+                ) : (
+                  row.quantity
+                )}
+              </TableCell>
+
+              <TableCell
+                align="center"
+                sx={{
+                  width: "30%",
+                }}
+              >
                 <Stack
-                  direction="row"
-                  spacing={1}
                   sx={{
                     justifyContent: "center",
                   }}
+                  direction="row"
+                  spacing={1}
                 >
                   {editRow !== row.id && (
                     <Button
@@ -209,9 +207,9 @@ export function Table({ refresh }: { refresh: number }) {
 
                   <Button
                     size="small"
-                    color="error"
                     variant="outlined"
-                    onClick={() => handleDelete(row)}
+                    color="error"
+                    onClick={() => onDelete(row)}
                   >
                     Delete
                   </Button>

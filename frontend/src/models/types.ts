@@ -12,3 +12,6 @@ export interface User {
     role: 'admin' | 'user';
 }
 
+export type NewItem = Omit<Item, "id">
+
+
