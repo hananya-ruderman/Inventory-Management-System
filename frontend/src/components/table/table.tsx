@@ -98,10 +98,6 @@ export function Table({ refresh }: { refresh: number }) {
     setSearch(event.target.value);
   }
 
-  if (!Array.isArray(data) || !Array.length || data[0] === undefined) {
-    return <p>No data available</p>;
-  }
-
   const tableData = useMemo(
     () =>
       data.filter((item) =>
@@ -110,6 +106,12 @@ export function Table({ refresh }: { refresh: number }) {
     [data, search],
   );
 
+
+  if (!Array.isArray(data) || !Array.length || data[0] === undefined) {
+    return <p>No data available</p>;
+  }
+
+  
   return (
     <Paper
       elevation={3}
