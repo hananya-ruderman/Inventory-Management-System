@@ -1,6 +1,6 @@
 import type { Item } from "../../models/types";
 import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import logger from "../../utils/logging";
 import axios from "axios";
 
@@ -102,9 +102,14 @@ export function Table({ refresh }: { refresh: number }) {
     return <p>No data available</p>;
   }
 
-  const tableData = data.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
+  const tableData = useMemo(
+    () =>
+      data.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [data, search],
   );
+
   return (
     <Paper
       elevation={3}
