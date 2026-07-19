@@ -12,29 +12,34 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
 } from "@mui/material";
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState<"admin" | "user">("user");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   async function handleRegister() {
+    setError(null);
+
     if (!username || !password) {
-      alert("Username and password are required");
+      setError("Username and password are required");
       return;
     }
+
     try {
       await register({ username, password, role });
       navigate("/login");
     } catch (error) {
       if (error instanceof Error) {
         logger.warn("Registration failed:", error.message);
-        alert(`Registration failed: ${error.message}`);
+        setError(error.message);
       } else {
         logger.warn("Registration failed:", error);
-        alert("Registration failed: An unknown error occurred");
+        setError("An unknown error occurred");
       }
     }
   }
@@ -58,6 +63,12 @@ export default function Register() {
         <Typography variant="h4" gutterBottom>
           Register
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         <TextField
           label="Username"
