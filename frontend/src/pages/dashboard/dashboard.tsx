@@ -3,6 +3,7 @@ import { useUser } from "../../state/user";
 import { Table } from "../../components/table/table";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import Mazpenlogo from "../../assets/Mazpenlogo.png"
 import Model from "../../components/model/Model";
 import {
   AppBar,
@@ -48,7 +49,7 @@ export default function Dashboard() {
         <Toolbar>
           <Box
             component="img"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Mazpenlogo.png/500px-Mazpenlogo.png"
+            src={Mazpenlogo}
             alt="Logo"
             sx={{
               height: 40,
