@@ -40,7 +40,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         data: {
           name,
           price,
-          stock: stock || 1,
+          stock: stock ?? 1,
           sku: randomUUID(),
           createdBy: {
             connect: {
@@ -94,7 +94,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         data: {
           name,
           price,
-          stock: stock || 1,
+          stock: stock ?? 1,
         },
       });
 
