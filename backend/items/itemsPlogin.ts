@@ -14,7 +14,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     },
   });
 
-  reply.send(data);
+  return reply.send(data);
 });
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
@@ -50,7 +50,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         },
       });
 
-      reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
+      return reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
     },
   );
 
@@ -86,7 +86,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
       });
 
       if (!item) {
-        reply.status(404).send({ massage: masseges.ITEM_NOT_FOUND });
+        return reply.status(404).send({ massage: masseges.ITEM_NOT_FOUND });
       }
 
       const updatedItem = await prisma.item.update({
@@ -98,7 +98,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         },
       });
 
-      reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
+      return reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
     },
   );
 
