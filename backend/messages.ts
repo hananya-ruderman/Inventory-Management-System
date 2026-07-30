@@ -1,5 +1,5 @@
 
-export const masseges = {
+export const messages = {
   USER_ALREADY_EXISTS: "User already exists",
   USER_CREATED: "User created",
   USER_NOT_FOUND: "User for this username is not found",

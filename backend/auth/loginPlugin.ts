@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import type { User } from "../users/usersTypes.ts";
+import type { User } from "../users/usersTypes.js";
 import bcrypt from 'bcrypt'
 import {prisma} from '../db/dbConn.js'
 import { messages } from "../messages.js";

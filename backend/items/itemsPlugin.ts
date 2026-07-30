@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../db/dbConn.js";
-import type { Item } from "./itemsTypes.ts";
+import type { Item } from "./itemsTypes.js";
 import { randomUUID } from "crypto";
 import { messages } from "../messages.js";
 
