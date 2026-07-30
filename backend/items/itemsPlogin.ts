@@ -2,9 +2,9 @@ import type { FastifyInstance } from "fastify";
 import { prisma } from "../db/dbConn.js";
 import type { Item } from "./itemsTypes.ts";
 import { randomUUID } from "crypto";
-import { masseges } from "../messages.js";
+import { messages } from "../messages.js";
 
-export default async function itemsPlogin(fastify: FastifyInstance) {
+export default async function itemsPlugin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
@@ -50,7 +50,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         },
       });
 
-      return reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
+      return reply.status(201).send({ massage: messages.ITEM_CREATED, item: newItem });
     },
   );
 
@@ -86,7 +86,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
       });
 
       if (!item) {
-        return reply.status(404).send({ massage: masseges.ITEM_NOT_FOUND });
+        return reply.status(404).send({ massage: messages.ITEM_NOT_FOUND });
       }
 
       const updatedItem = await prisma.item.update({
@@ -98,7 +98,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         },
       });
 
-      return reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
+      return reply.status(200).send({ massage: messages.UPDATE_SUCCESS, updatedItem });
     },
   );
 
@@ -153,13 +153,13 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         });
 
         return reply.status(200).send({
-          message: masseges.UPDATE_SUCCESS,
+          message: messages.UPDATE_SUCCESS,
           item: updatedItem,
         });
       } catch (error: any) {
-        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+        if (error.code === messages.RECORD_NOT_FOUND_CODE) {
           return reply.status(404).send({
-            message: masseges.ITEM_NOT_FOUND,
+            message: messages.ITEM_NOT_FOUND,
           });
         }
 
@@ -189,13 +189,13 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         });
 
         return reply.status(200).send({
-          message: masseges.ITEM_DELETED,
+          message: messages.ITEM_DELETED,
           item: deletedItem,
         });
       } catch (error: any) {
-        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+        if (error.code === messages.RECORD_NOT_FOUND_CODE) {
           return reply.status(404).send({
-            message: masseges.ITEM_NOT_FOUND,
+            message: messages.ITEM_NOT_FOUND,
           });
         }
 

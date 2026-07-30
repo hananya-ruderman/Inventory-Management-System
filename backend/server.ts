@@ -1,10 +1,10 @@
 import { env } from "./config/env.js";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import itemsPlogin from "./items/itemsPlogin.js";
-import authRoutes from "./auth/loginPlogin.js";
-import jwtPlogin from "./auth/jwtPlogin.js";
-import usersPlogin from "./users/usersPlogin.js";
+import itemsPlugin from "./items/itemsPlugin.js";
+import authRoutes from "./auth/loginPlugin.js";
+import jwtPlugin from "./auth/jwtPlugin.js";
+import usersPlugin from "./users/usersPlugin.js";
 import { logger } from "./utils/logging.js";
 import { connectDatabase } from "./db/dbConn.js";
 
@@ -16,10 +16,10 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
-server.register(jwtPlogin);
+server.register(jwtPlugin);
 server.register(authRoutes);
-server.register(usersPlogin);
-server.register(itemsPlogin);
+server.register(usersPlugin);
+server.register(itemsPlugin);
 
 async function startServer() {
   try {
