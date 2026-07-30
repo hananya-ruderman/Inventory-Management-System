@@ -11,6 +11,7 @@ import {
   TextField,
   Button,
   Stack,
+  Toolbar,
 } from "@mui/material";
 
 type Props = {
@@ -67,38 +68,30 @@ export function InventoryTable({ data, onDelete, onUpdate }: Props) {
         overflow: "hidden",
       }}
     >
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          px: 0,
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <h3>Products Table</h3>
+
+        <TextField
+          size="small"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Toolbar>
       <MuiTable
         sx={{
           minWidth: 700,
         }}
       >
         <TableHead>
-          <TableRow>
-            <TableCell
-              colSpan={4}
-              sx={{
-                backgroundColor: "background.paper",
-                py: 2,
-              }}
-            >
-              <Stack
-                direction="row"
-                sx={{
-                  justifyContent: "space-between",
-                }}
-              >
-                <h3>Products Table</h3>
-
-                <TextField
-                  size="small"
-                  placeholder="Search..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </Stack>
-            </TableCell>
-          </TableRow>
-
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell align="center">Price</TableCell>
