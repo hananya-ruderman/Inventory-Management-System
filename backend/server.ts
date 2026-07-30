@@ -25,7 +25,7 @@ async function startServer() {
   try {
     await server.listen({ port });
     logger.info(`Server is running on port ${port}`);
-    connectDatabase();
+    await connectDatabase();
   } catch (error) {
     logger.error("Error starting server:", error);
   }
