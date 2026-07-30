@@ -12,5 +12,5 @@ export const prisma = new PrismaClient({ adapter });
 export async function connectDatabase() {
   await prisma.$connect();
   await prisma.$queryRaw`SELECT 1`;
-  logger.warn("Connected to postgreSql DB through prisma");
+  logger.info("Connected to postgreSql DB through prisma");
 }
