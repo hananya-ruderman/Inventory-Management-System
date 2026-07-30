@@ -24,7 +24,7 @@ server.register(itemsPlogin);
 async function startServer() {
   try {
     await server.listen({ port });
-    logger.warn(`Server is running on port ${port}`);
+    logger.info(`Server is running on port ${port}`);
     connectDatabase();
   } catch (error) {
     logger.error("Error starting server:", error);
