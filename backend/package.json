@@ -4,7 +4,8 @@
   "description": "This system will allow a fictional store to track products, manage stock levels, categorize items, and view analytics. It will include a fully authenticated user flow.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "tsx server.ts"
   },
   "repository": {
     "type": "git",
