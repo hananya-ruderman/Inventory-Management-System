@@ -10,9 +10,10 @@ import { connectDatabase } from "./db/dbConn.js";
 
 const server = Fastify({ logger: false });
 
-const port = Number(env.serverPort);
+const port = env.serverPort;
+const host = env.host
 server.register(cors, {
-  origin: "http://localhost:5173",
+  origin: env.frontendUrl!,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
@@ -23,7 +24,7 @@ server.register(itemsPlogin);
 
 async function startServer() {
   try {
-    await server.listen({ port });
+    await server.listen({ port, host: host?? "0.0.0.0" });
     logger.warn(`Server is running on port ${port}`);
     connectDatabase();
   } catch (error) {
