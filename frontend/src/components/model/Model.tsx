@@ -1,85 +1,167 @@
 import { useState, type SetStateAction } from "react";
-import { addItem } from "../../api/dataApi";
-import "./model.css";
+import type { NewItem } from "../../models/types";
+import {
+  STATUS,
+  MESSAGESE,
+  FORM_FIELDS,
+  FORM_LABELS,
+} from "../../utils/messages";
 
-type status = "idle" | "loading" | "success" | "error";
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  IconButton,
+  Alert,
+  Stack,
+} from "@mui/material";
 
-export default function Model({
-  setIsOpen,
-  onSuccess,
-}: {
+import CloseIcon from "@mui/icons-material/Close";
+
+type Status = (typeof STATUS)[keyof typeof STATUS];
+
+interface ModelProps {
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
-  onSuccess: () => void;
-}) {
-  const [name, setName] = useState<string | null>(null);
-  const [price, setPrice] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState<string | null>(null);
-  const [status, setStatus] = useState<status>("idle");
+  onSuccess: (item: NewItem) => void;
+}
+
+interface FormState {
+  name: string;
+  price: string;
+  quantity: string;
+}
+
+export default function Model(props: ModelProps) {
+  const { setIsOpen, onSuccess } = props;
+
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    price: "",
+    quantity: "",
+  });
+  const [status, setStatus] = useState<Status>(STATUS.IDLE);
   const [isRequired, setIsRequired] = useState<boolean>(false);
 
   async function handleSave() {
-    if (!name || !price) {
+    if (!form.name || !form.price) {
       setIsRequired(true);
       return;
     }
+
     setIsRequired(false);
-    setStatus("loading");
-    const newItem = { name, price: +price, quantity: quantity ? +quantity : 0 };
+    setStatus(STATUS.LOADING);
+
+    const newItem: NewItem = {
+      name: form.name,
+      price: +form.price,
+      quantity: form.quantity ? +form.quantity : 0,
+    };
 
     try {
-      await addItem(newItem);
-      setStatus("success");
+      onSuccess(newItem);
+
+      setStatus(STATUS.SUCCESS);
+
       setTimeout(() => {
         setIsOpen(false);
-        onSuccess();
       }, 2000);
     } catch (error) {
-      setStatus("error");
+      setStatus(STATUS.ERROR);
 
       setTimeout(() => {
         setIsOpen(false);
       }, 2000);
     }
   }
-
   return (
-    <div className="add-item-container">
-      {status === "idle" && (
-        <div className="add-item">
-          <button className="close-btn" onClick={() => setIsOpen(false)}>
-            ×
-          </button>
-          <h3>new item</h3>
-          <label htmlFor="name">name*</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            onChange={(e) => setName(e.target.value)}
-          />
-          {isRequired && !name && <p className="error">name is required</p>}
-          <label htmlFor="price">price*</label>
-          <input
-            type="text"
-            id="price"
-            name="price"
-            onChange={(e) => setPrice(e.target.value)}
-          />
-          {isRequired && !price && <p className="error">price is required</p>}
+    <Box
+      sx={{
+        p: 3,
+        width: 400,
+      }}
+    >
+      {status === STATUS.IDLE && (
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography variant="h5">{MESSAGESE.ITEM.NEW_ITEM}</Typography>
 
-          <label htmlFor="quantity">quantity</label>
-          <input
-            type="text"
-            id="quantity"
-            name="quantity"
-            onChange={(e) => setQuantity(e.target.value)}
+            <IconButton onClick={() => setIsOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+
+          <TextField
+            label={FORM_LABELS.ITEM.NAME}
+            required
+            name={FORM_FIELDS.ITEM.NAME}
+            value={form.name}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            error={isRequired && !form.name}
+            helperText={
+              isRequired && !form.name ? MESSAGESE.VALIDATION.NAME_REQUIRED : ""
+            }
           />
-          <button onClick={handleSave}>save</button>
-        </div>
+
+          <TextField
+            label={FORM_LABELS.ITEM.PRICE}
+            required
+            name={FORM_FIELDS.ITEM.PRICE}
+            value={form.price}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                price: e.target.value,
+              }))
+            }
+            error={isRequired && !form.price}
+            helperText={
+              isRequired && !form.price
+                ? MESSAGESE.VALIDATION.PRICE_REQUIRED
+                : ""
+            }
+          />
+
+          <TextField
+            label={FORM_LABELS.ITEM.QUANTITY}
+            name={FORM_FIELDS.ITEM.QUANTITY}
+            value={form.quantity}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                quantity: e.target.value,
+              }))
+            }
+          />
+
+          <Button variant="contained" onClick={handleSave}>
+            Save
+          </Button>
+        </Stack>
       )}
-      {status === "loading" && <p>edding item...</p>}
-      {status === "success" && <h2>item added successfully</h2>}
-      {status === "error" && <h2 className="error">error in edding item</h2>}
-    </div>
+
+      {status === STATUS.LOADING && (
+        <Alert severity="info">{MESSAGESE.ITEM.ADDING}</Alert>
+      )}
+
+      {status === STATUS.SUCCESS && (
+        <Alert severity="success">{MESSAGESE.ITEM.ADDED_SUCCESSFULLY}</Alert>
+      )}
+
+      {status === STATUS.ERROR && (
+        <Alert severity="error">{MESSAGESE.ITEM.ADD_ERROR}</Alert>
+      )}
+    </Box>
   );
 }

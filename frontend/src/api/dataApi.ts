@@ -1,8 +1,8 @@
 import api from "./apiConfig";
-import type { Item } from "../models/types";
+import type { Item, NewItem } from "../models/types";
 
-export async function fetchItems() {
-    const response = await api.get('/items');
+export async function fetchItems(signal?: AbortSignal) {
+    const response = await api.get('/items', {signal});
     return response.data;
 }
 
@@ -11,9 +11,8 @@ export async function editItem(id: Item['id'], item: Item){
     return response.data
 }
 
-export async function addItem(item: Omit<Item, 'id'>){
+export async function addItem(item: NewItem){
     const response = await api.post(`/items`, item)
-    console.log(response.data);
     return response.data
 }
 

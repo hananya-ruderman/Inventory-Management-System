@@ -1,15 +1,15 @@
-import { FastifyInstance } from "fastify";
-import fs from "fs/promises";
-import type { Item } from "./itemsTypes";
+import type { FastifyInstance } from "fastify";
+import { prisma } from "../db/dbConn.js";
+import type { Item } from "./itemsTypes.ts";
+import { randomUUID } from "crypto";
+import { masseges } from "../massegas.js";
 
 export default async function itemsPlogin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
-    const data = await fs.readFile("./items/items.json", "utf-8");
-
-    const parsedData = JSON.parse(data);
-    reply.send(parsedData);
+    const data = await prisma.item.findMany();
+    reply.send(data);
   });
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
@@ -29,26 +29,23 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const { name, price, quantity } = request.body;
+      const { id } = request.user;
 
-      const data = await fs.readFile("./items/items.json", "utf-8");
+      const newItem = await prisma.item.create({
+        data: {
+          name,
+          price,
+          stock: quantity || 1,
+          sku: randomUUID(),
+          createdBy: {
+            connect: {
+              id,
+            },
+          },
+        },
+      });
 
-      const itemsObj = JSON.parse(data);
-
-      const newItem = {
-        id: itemsObj.items.length + 1,
-        name,
-        price,
-        quantity: quantity || 1,
-      };
-
-      itemsObj.items.push(newItem);
-
-      await fs.writeFile(
-        "./items/items.json",
-        JSON.stringify(itemsObj, null, 2),
-      );
-
-      reply.status(201).send({ massage: "posting succede", item: newItem });
+      reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
     },
   );
 
@@ -79,29 +76,35 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
 
       const { name, price, quantity } = request.body;
 
-      const data = await fs.readFile("./items/items.json", "utf-8");
-
-      const itemsObj = JSON.parse(data);
-
-      const item = itemsObj.items.find((item: Item) => item.id === id);
+      const item = await prisma.item.findUnique({
+        where: { id },
+      });
 
       if (!item) {
-        reply.status(404).send({ massage: "item not found" });
+        reply.status(404).send({ massage: masseges.ITEM_NOT_FOUND });
       }
 
-      item.name = name; 
-      item.price = price;
-      item.quantity = quantity ?? 1;
+      const updatedItem = await prisma.item.update({
+        where: { id },
+        data: {
+          name,
+          price,
+          stock: quantity || 1,
+        },
+      });
 
-      await fs.writeFile(
-        "./items/items.json",
-        JSON.stringify(itemsObj, null, 2),
-      );
-      reply.status(200).send({ massage: "update succede", item });
+      reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
     },
   );
 
-  fastify.patch<{ Params: { id: string }; Body: Item }>(
+  fastify.patch<{
+    Params: { id: string };
+    Body: Partial<{
+      name: string;
+      price: number;
+      quantity: number;
+    }>;
+  }>(
     "/items/:id",
     {
       schema: {
@@ -120,10 +123,10 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
             quantity: { type: "number" },
           },
           anyOf: [
-            {required: ["name"]},
-            {required: ["price"]},
-            {required: ["quantity"]}
-          ]
+            { required: ["name"] },
+            { required: ["price"] },
+            { required: ["quantity"] },
+          ],
         },
       },
     },
@@ -132,25 +135,31 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
 
       const { name, price, quantity } = request.body;
 
-      const data = await fs.readFile("./items/items.json", "utf-8");
+      const data = {
+        ...(name !== undefined && { name }),
+        ...(price !== undefined && { price }),
+        ...(quantity !== undefined && { stock: quantity }),
+      };
 
-      const itemsObj = JSON.parse(data);
+      try {
+        const updatedItem = await prisma.item.update({
+          where: { id },
+          data,
+        });
 
-      const item = itemsObj.items.find((item: Item) => item.id === id);
+        return reply.status(200).send({
+          message: masseges.UPDATE_SUCCESS,
+          item: updatedItem,
+        });
+      } catch (error: any) {
+        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+          return reply.status(404).send({
+            message: masseges.ITEM_NOT_FOUND,
+          });
+        }
 
-      if (!item) {
-        reply.status(404).send({ massage: "item not found" });
+        throw error;
       }
-
-      item.name = name ?? item.name;
-      item.price = price ?? item.price;
-      item.quantity = quantity ?? item.quantity;
-
-      await fs.writeFile(
-        "./items/items.json",
-        JSON.stringify(itemsObj, null, 2),
-      );
-      reply.status(200).send({ massage: "update succede", item });
     },
   );
   fastify.delete<{ Params: { id: string } }>(
@@ -168,25 +177,25 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const id = Number(request.params.id);
-        console.log(id);
-      const data = await fs.readFile("./items/items.json", "utf-8");
 
-      const itemsObj = JSON.parse(data);
-        console.log(itemsObj);
-      const index = itemsObj.items.findIndex((item: Item) => item.id === id);
+      try {
+        const deletedItem = await prisma.item.delete({
+          where: { id },
+        });
 
-      if (index === -1) {
-        reply.status(404).send({ massage: "item not found" });
+        return reply.status(200).send({
+          message: masseges.ITEM_DELETED,
+          item: deletedItem,
+        });
+      } catch (error: any) {
+        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+          return reply.status(404).send({
+            message: masseges.ITEM_NOT_FOUND,
+          });
+        }
+
+        throw error;
       }
-
-      const deletedItem = itemsObj.items.splice(index, 1)[0];
-
-      await fs.writeFile(
-        "./items/items.json",
-        JSON.stringify(itemsObj, null, 2),
-      );
-
-      reply.status(204).send(deletedItem);
     },
   );
 }
