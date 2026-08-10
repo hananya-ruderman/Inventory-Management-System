@@ -1,0 +1,135 @@
+import { useUser } from "../../state/user";
+import { InventoryTable } from "../../components/table/table";
+import { useInventory } from "../../hooks/useInventory";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
+import Mazpenlogo from "../../assets/Mazpenlogo.png";
+import Model from "../../components/model/Model";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Button,
+  Dialog,
+} from "@mui/material";
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  const { currentUser, setCurrentUser } = useUser();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { data, addItem, updateItem, removeItem } = useInventory();
+
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem("currentUser", currentUser);
+    } else {
+      const stored = localStorage.getItem("currentUser");
+      if (stored) setCurrentUser(stored);
+    }
+  }, [currentUser]);
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    navigate("/login");
+  }
+
+  return (
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <AppBar position="fixed">
+        <Toolbar>
+          <Box
+            component="img"
+            src={Mazpenlogo}
+            alt="Logo"
+            sx={{
+              height: 40,
+              mr: 3,
+            }}
+          />
+
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Welcome, {currentUser}!
+          </Typography>
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleLogout}
+            sx={{ ml: 3 }}
+          >
+            Logout
+          </Button>
+        </Toolbar>
+      </AppBar>
+
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: 240,
+          flexShrink: 0,
+
+          "& .MuiDrawer-paper": {
+            width: 240,
+            boxSizing: "border-box",
+            mt: 8,
+          },
+        }}
+      >
+        <List>
+          {["Home", "Products", "Orders", "Customers", "Reports"].map(
+            (item) => (
+              <ListItem key={item} disablePadding>
+                <ListItemButton>
+                  <ListItemText primary={item} />
+                </ListItemButton>
+              </ListItem>
+            ),
+          )}
+        </List>
+      </Drawer>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          mt: 8,
+          bgcolor: "background.default",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 3,
+          }}
+        >
+          <Typography variant="h4">Dashboard</Typography>
+
+          <Button
+            variant="contained"
+            disabled={isOpen}
+            onClick={() => setIsOpen(true)}
+          >
+            Add Item
+          </Button>
+        </Box>
+        <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="sm">
+          <Model setIsOpen={setIsOpen} onSuccess={addItem} />
+        </Dialog>
+        <InventoryTable
+          data={data}
+          onDelete={removeItem}
+          onUpdate={updateItem}
+        />
+      </Box>
+    </Box>
+  );
+}
