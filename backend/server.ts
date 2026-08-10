@@ -1,12 +1,12 @@
 import { env } from "./config/env.js";
 import Fastify from "fastify";
 import cors from "@fastify/cors";
-import itemsPlogin from "./items/itemsPlogin.js";
-import authRoutes from "./auth/loginPlogin.js";
-import jwtPlogin from "./auth/jwtPlogin.js";
-import usersPlogin from "./users/usersPlogin.js";
-import { prisma } from "./db/dbConn.js";
-import {logger} from './utils/logging.js'
+import itemsPlugin from "./items/itemsPlugin.js";
+import authRoutes from "./auth/loginPlugin.js";
+import jwtPlugin from "./auth/jwtPlugin.js";
+import usersPlugin from "./users/usersPlugin.js";
+import { logger } from "./utils/logging.js";
+import { connectDatabase } from "./db/dbConn.js";
 
 const server = Fastify({ logger: false });
 
@@ -16,17 +16,16 @@ server.register(cors, {
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
 });
 
-server.register(jwtPlogin);
+server.register(jwtPlugin);
 server.register(authRoutes);
-server.register(usersPlogin);
-server.register(itemsPlogin);
+server.register(usersPlugin);
+server.register(itemsPlugin);
 
 async function startServer() {
   try {
     await server.listen({ port });
-    logger.warn(`Server is running on port ${port}`);
-    await prisma.$connect();
-    logger.warn("Connected to postgreSql DB through prisma");
+    logger.info(`Server is running on port ${port}`);
+    await connectDatabase();
   } catch (error) {
     logger.error("Error starting server:", error);
   }

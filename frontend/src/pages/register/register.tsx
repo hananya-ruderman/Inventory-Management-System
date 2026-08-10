@@ -8,24 +8,18 @@ import {
   Typography,
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Alert,
 } from "@mui/material";
 
 type RegisterForm = {
   username: string;
   password: string;
-  role: "admin" | "user";
 };
 
 export default function Register() {
   const [form, setForm] = useState<RegisterForm>({
     username: "",
     password: "",
-    role: "user",
   });
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -41,8 +35,7 @@ export default function Register() {
     try {
       await register({
         username: form.username,
-        password: form.password,
-        role: form.role,
+        password: form.password
       });
       navigate("/login");
     } catch (error) {
@@ -109,24 +102,7 @@ export default function Register() {
           margin="normal"
         />
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Role</InputLabel>
-
-          <Select
-            value={form.role}
-            label="Role"
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                role: e.target.value,
-              }))
-            }
-          >
-            <MenuItem value="user">User</MenuItem>
-
-            <MenuItem value="admin">Admin</MenuItem>
-          </Select>
-        </FormControl>
+        
 
         <Button
           variant="contained"

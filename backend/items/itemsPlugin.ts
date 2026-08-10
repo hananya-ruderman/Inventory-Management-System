@@ -1,16 +1,21 @@
 import type { FastifyInstance } from "fastify";
 import { prisma } from "../db/dbConn.js";
-import type { Item } from "./itemsTypes.ts";
+import type { Item } from "./itemsTypes.js";
 import { randomUUID } from "crypto";
-import { masseges } from "../massegas.js";
+import { messages } from "../messages.js";
 
-export default async function itemsPlogin(fastify: FastifyInstance) {
+export default async function itemsPlugin(fastify: FastifyInstance) {
   fastify.addHook("preHandler", fastify.auth);
 
   fastify.get("/items", async (request, reply) => {
-    const data = await prisma.item.findMany();
-    reply.send(data);
+  const data = await prisma.item.findMany({
+    orderBy: {
+      id: "asc",
+    },
   });
+
+  return reply.send(data);
+});
 
   fastify.post<{ Body: Omit<Item, "id"> }>(
     "/items",
@@ -21,21 +26,21 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           required: ["name", "price"],
           properties: {
             name: { type: "string" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
             price: { type: "number" },
           },
         },
       },
     },
     async (request, reply) => {
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
       const { id } = request.user;
 
       const newItem = await prisma.item.create({
         data: {
           name,
           price,
-          stock: quantity || 1,
+          stock: stock ?? 1,
           sku: randomUUID(),
           createdBy: {
             connect: {
@@ -45,7 +50,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         },
       });
 
-      reply.status(201).send({ massage: masseges.ITEM_CREATED, item: newItem });
+      return reply.status(201).send({ massage: messages.ITEM_CREATED, item: newItem });
     },
   );
 
@@ -66,7 +71,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           properties: {
             name: { type: "string" },
             price: { type: "number" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
           },
         },
       },
@@ -74,14 +79,14 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     async (request, reply) => {
       const id = Number(request.params.id);
 
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
 
       const item = await prisma.item.findUnique({
         where: { id },
       });
 
       if (!item) {
-        reply.status(404).send({ massage: masseges.ITEM_NOT_FOUND });
+        return reply.status(404).send({ massage: messages.ITEM_NOT_FOUND });
       }
 
       const updatedItem = await prisma.item.update({
@@ -89,11 +94,11 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         data: {
           name,
           price,
-          stock: quantity || 1,
+          stock: stock ?? 1,
         },
       });
 
-      reply.status(200).send({ massage: masseges.UPDATE_SUCCESS, updatedItem });
+      return reply.status(200).send({ massage: messages.UPDATE_SUCCESS, updatedItem });
     },
   );
 
@@ -102,7 +107,7 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     Body: Partial<{
       name: string;
       price: number;
-      quantity: number;
+      stock: number;
     }>;
   }>(
     "/items/:id",
@@ -120,12 +125,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
           properties: {
             name: { type: "string" },
             price: { type: "number" },
-            quantity: { type: "number" },
+            stock: { type: "number" },
           },
           anyOf: [
             { required: ["name"] },
             { required: ["price"] },
-            { required: ["quantity"] },
+            { required: ["stock"] },
           ],
         },
       },
@@ -133,12 +138,12 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
     async (request, reply) => {
       const id = Number(request.params.id);
 
-      const { name, price, quantity } = request.body;
+      const { name, price, stock } = request.body;
 
       const data = {
         ...(name !== undefined && { name }),
         ...(price !== undefined && { price }),
-        ...(quantity !== undefined && { stock: quantity }),
+        ...(stock !== undefined && { stock }),
       };
 
       try {
@@ -148,13 +153,13 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         });
 
         return reply.status(200).send({
-          message: masseges.UPDATE_SUCCESS,
+          message: messages.UPDATE_SUCCESS,
           item: updatedItem,
         });
       } catch (error: any) {
-        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+        if (error.code === messages.RECORD_NOT_FOUND_CODE) {
           return reply.status(404).send({
-            message: masseges.ITEM_NOT_FOUND,
+            message: messages.ITEM_NOT_FOUND,
           });
         }
 
@@ -184,13 +189,13 @@ export default async function itemsPlogin(fastify: FastifyInstance) {
         });
 
         return reply.status(200).send({
-          message: masseges.ITEM_DELETED,
+          message: messages.ITEM_DELETED,
           item: deletedItem,
         });
       } catch (error: any) {
-        if (error.code === masseges.RECORD_NOT_FOUND_CODE) {
+        if (error.code === messages.RECORD_NOT_FOUND_CODE) {
           return reply.status(404).send({
-            message: masseges.ITEM_NOT_FOUND,
+            message: messages.ITEM_NOT_FOUND,
           });
         }
 
