@@ -1,39 +1,50 @@
 import { register } from "../../api/registerApi";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import logger from "../../utils/logging";
 import {
   Box,
   Paper,
   Typography,
   TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
+  Alert,
 } from "@mui/material";
 
+type RegisterForm = {
+  username: string;
+  password: string;
+};
+
 export default function Register() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [role, setRole] = useState<"admin" | "user">("user");
+  const [form, setForm] = useState<RegisterForm>({
+    username: "",
+    password: "",
+  });
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   async function handleRegister() {
-    if (!username || !password) {
-      alert("Username and password are required");
+    setError(null);
+
+    if (!form.username || !form.password) {
+      setError("Username and password are required");
       return;
     }
+
     try {
-      await register({ username, password, role });
+      await register({
+        username: form.username,
+        password: form.password
+      });
       navigate("/login");
     } catch (error) {
       if (error instanceof Error) {
-        console.error("Registration failed:", error.message);
-        alert(`Registration failed: ${error.message}`);
+        logger.warn("Registration failed:", error.message);
+        setError(error.message);
       } else {
-        console.error("Registration failed:", error);
-        alert("Registration failed: An unknown error occurred");
+        logger.warn("Registration failed:", error);
+        setError("An unknown error occurred");
       }
     }
   }
@@ -58,10 +69,21 @@ export default function Register() {
           Register
         </Typography>
 
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
         <TextField
           label="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={form.username}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              username: e.target.value,
+            }))
+          }
           fullWidth
           margin="normal"
         />
@@ -69,25 +91,18 @@ export default function Register() {
         <TextField
           label="Password"
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={form.password}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              password: e.target.value,
+            }))
+          }
           fullWidth
           margin="normal"
         />
 
-        <FormControl fullWidth margin="normal">
-          <InputLabel>Role</InputLabel>
-
-          <Select
-            value={role}
-            label="Role"
-            onChange={(e) => setRole(e.target.value as "admin" | "user")}
-          >
-            <MenuItem value="user">User</MenuItem>
-
-            <MenuItem value="admin">Admin</MenuItem>
-          </Select>
-        </FormControl>
+        
 
         <Button
           variant="contained"

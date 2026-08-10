@@ -1,7 +1,13 @@
 import { useState, type SetStateAction } from "react";
-import { addItem } from "../../api/dataApi";
+import type { NewItem } from "../../models/types";
+import {
+  STATUS,
+  MESSAGESE,
+  FORM_FIELDS,
+  FORM_LABELS,
+} from "../../utils/messages";
 
- import {
+import {
   Box,
   Typography,
   TextField,
@@ -12,147 +18,150 @@ import { addItem } from "../../api/dataApi";
 } from "@mui/material";
 
 import CloseIcon from "@mui/icons-material/Close";
-type status = "idle" | "loading" | "success" | "error";
 
-export default function Model({
-  setIsOpen,
-  onSuccess,
-}: {
+type Status = (typeof STATUS)[keyof typeof STATUS];
+
+interface ModelProps {
   setIsOpen: React.Dispatch<SetStateAction<boolean>>;
-  onSuccess: () => void;
-}) {
-  const [name, setName] = useState<string | null>(null);
-  const [price, setPrice] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState<string | null>(null);
-  const [status, setStatus] = useState<status>("idle");
+  onSuccess: (item: NewItem) => void;
+}
+
+interface FormState {
+  name: string;
+  price: string;
+  quantity: string;
+}
+
+export default function Model(props: ModelProps) {
+  const { setIsOpen, onSuccess } = props;
+
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    price: "",
+    quantity: "",
+  });
+  const [status, setStatus] = useState<Status>(STATUS.IDLE);
   const [isRequired, setIsRequired] = useState<boolean>(false);
 
   async function handleSave() {
-    if (!name || !price) {
+    if (!form.name || !form.price) {
       setIsRequired(true);
       return;
     }
+
     setIsRequired(false);
-    setStatus("loading");
-    const newItem = { name, price: +price, quantity: quantity ? +quantity : 0 };
+    setStatus(STATUS.LOADING);
+
+    const newItem: NewItem = {
+      name: form.name,
+      price: +form.price,
+      quantity: form.quantity ? +form.quantity : 0,
+    };
 
     try {
-      await addItem(newItem);
-      setStatus("success");
+      onSuccess(newItem);
+
+      setStatus(STATUS.SUCCESS);
+
       setTimeout(() => {
         setIsOpen(false);
-        onSuccess();
       }, 2000);
     } catch (error) {
-      setStatus("error");
+      setStatus(STATUS.ERROR);
 
       setTimeout(() => {
         setIsOpen(false);
       }, 2000);
     }
   }
-
-
-return (
-  <Box
-    sx={{
-      p: 3,
-      width: 400,
-    }}
-  >
-
-    {status === "idle" && (
-      <Stack spacing={2}>
-
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h5">
-            New Item
-          </Typography>
-
-          <IconButton
-            onClick={() => setIsOpen(false)}
+  return (
+    <Box
+      sx={{
+        p: 3,
+        width: 400,
+      }}
+    >
+      {status === STATUS.IDLE && (
+        <Stack spacing={2}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
           >
-            <CloseIcon />
-          </IconButton>
+            <Typography variant="h5">{MESSAGESE.ITEM.NEW_ITEM}</Typography>
 
-        </Box>
+            <IconButton onClick={() => setIsOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
 
+          <TextField
+            label={FORM_LABELS.ITEM.NAME}
+            required
+            name={FORM_FIELDS.ITEM.NAME}
+            value={form.name}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                name: e.target.value,
+              }))
+            }
+            error={isRequired && !form.name}
+            helperText={
+              isRequired && !form.name ? MESSAGESE.VALIDATION.NAME_REQUIRED : ""
+            }
+          />
 
-        <TextField
-          label="Name"
-          required
-          name="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          error={isRequired && !name}
-          helperText={
-            isRequired && !name
-              ? "Name is required"
-              : ""
-          }
-        />
+          <TextField
+            label={FORM_LABELS.ITEM.PRICE}
+            required
+            name={FORM_FIELDS.ITEM.PRICE}
+            value={form.price}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                price: e.target.value,
+              }))
+            }
+            error={isRequired && !form.price}
+            helperText={
+              isRequired && !form.price
+                ? MESSAGESE.VALIDATION.PRICE_REQUIRED
+                : ""
+            }
+          />
 
+          <TextField
+            label={FORM_LABELS.ITEM.QUANTITY}
+            name={FORM_FIELDS.ITEM.QUANTITY}
+            value={form.quantity}
+            onChange={(e) =>
+              setForm((prev) => ({
+                ...prev,
+                quantity: e.target.value,
+              }))
+            }
+          />
 
-        <TextField
-          label="Price"
-          required
-          name="price"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          error={isRequired && !price}
-          helperText={
-            isRequired && !price
-              ? "Price is required"
-              : ""
-          }
-        />
+          <Button variant="contained" onClick={handleSave}>
+            Save
+          </Button>
+        </Stack>
+      )}
 
+      {status === STATUS.LOADING && (
+        <Alert severity="info">{MESSAGESE.ITEM.ADDING}</Alert>
+      )}
 
-        <TextField
-          label="Quantity"
-          name="quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-        />
+      {status === STATUS.SUCCESS && (
+        <Alert severity="success">{MESSAGESE.ITEM.ADDED_SUCCESSFULLY}</Alert>
+      )}
 
-
-        <Button
-          variant="contained"
-          onClick={handleSave}
-        >
-          Save
-        </Button>
-
-      </Stack>
-    )}
-
-
-
-    {status === "loading" && (
-      <Alert severity="info">
-        Adding item...
-      </Alert>
-    )}
-
-
-    {status === "success" && (
-      <Alert severity="success">
-        Item added successfully
-      </Alert>
-    )}
-
-
-    {status === "error" && (
-      <Alert severity="error">
-        Error in adding item
-      </Alert>
-    )}
-
-  </Box>
-)};
+      {status === STATUS.ERROR && (
+        <Alert severity="error">{MESSAGESE.ITEM.ADD_ERROR}</Alert>
+      )}
+    </Box>
+  );
+}

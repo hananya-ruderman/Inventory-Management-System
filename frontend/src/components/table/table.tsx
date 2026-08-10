@@ -1,7 +1,7 @@
+import { useMemo, useState } from "react";
 import type { Item } from "../../models/types";
-import { deleteItem, editItem, fetchItems } from "../../api/dataApi";
-import { useState } from "react";
- import {
+
+import {
   Paper,
   Table as MuiTable,
   TableHead,
@@ -11,23 +11,31 @@ import { useState } from "react";
   TextField,
   Button,
   Stack,
+  Toolbar,
 } from "@mui/material";
 
-type setData = React.Dispatch<React.SetStateAction<Item[]>>;
+type Props = {
+  data: Item[];
+  onDelete: (item: Item) => void;
+  onUpdate: (item: Item) => void;
+};
 
-export function Table({ data, setData }: { data: Item[]; setData: setData }) {
-  const [editRow, setEditRow] = useState<Item["id"] | null>(null);
+export function InventoryTable({ data, onDelete, onUpdate }: Props) {
+  const [search, setSearch] = useState("");
+  const [editRow, setEditRow] = useState<number | string>("");
   const [editingItem, setEditingItem] = useState<Item | null>(null);
 
-  async function handleEdit(row: Item) {
+  function handleEdit(row: Item) {
     setEditRow(row.id);
     setEditingItem(row);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
+
     setEditingItem((prev) => {
       if (!prev) return prev;
+
       return {
         ...prev,
         [name]: value,
@@ -35,90 +43,179 @@ export function Table({ data, setData }: { data: Item[]; setData: setData }) {
     });
   }
 
-  async function handleSave() {
-    if (editingItem === null) return;
-    await editItem(editingItem.id, editingItem);
-    const fetchedItems = await fetchItems();
-    setData(fetchedItems.items);
-    setEditRow(null);
+  function handleSave() {
+    if (!editingItem) return;
+
+    onUpdate(editingItem);
+
+    setEditRow("");
+    setEditingItem(null);
   }
 
-  async function handleDelete(row: Item) {
-    await deleteItem(row.id)
-    const fetchedItems = await fetchItems()
-    setData(fetchedItems.items)
-  }
+  const tableData = useMemo(
+    () =>
+      data.filter((item) =>
+        item.name.toLowerCase().includes(search.toLowerCase()),
+      ),
+    [data, search],
+  );
 
-  if (!Array.isArray(data) || data.length === 0) {
-    return <p>No data available</p>;
-  }
+  return (
+    <Paper
+      elevation={2}
+      sx={{
+        borderRadius: 3,
+        overflow: "hidden",
+      }}
+    >
+      <Toolbar
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          px: 0,
+          borderBottom: 1,
+          borderColor: "divider",
+        }}
+      >
+        <h3>Products Table</h3>
 
+        <TextField
+          size="small"
+          placeholder="Search..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </Toolbar>
+      <MuiTable
+        sx={{
+          minWidth: 700,
+        }}
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell align="center">Price</TableCell>
+            <TableCell align="center">Quantity</TableCell>
+            <TableCell align="center">Actions</TableCell>
+          </TableRow>
+        </TableHead>
 
-
-return (
-  <Paper elevation={3}>
-    <MuiTable>
-      <TableHead>
-        <TableRow>
-          {Object.keys(data[0]).map((key) => (
-            <TableCell key={key}>{key}</TableCell>
-          ))}
-          <TableCell>Actions</TableCell>
-        </TableRow>
-      </TableHead>
-
-      <TableBody>
-        {data.map((row) => (
-          <TableRow key={row.id as string | number}>
-            {Object.entries(row).map(([key, value]) => {
-              const itemKey = key as keyof Item;
-
-              return (
-                <TableCell key={key}>
+        <TableBody>
+          {tableData.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} align="center">
+                No data available
+              </TableCell>
+            </TableRow>
+          ) : (
+            tableData.map((row) => (
+              <TableRow
+                key={row.id}
+                hover
+                sx={{
+                  "&:last-child td, &:last-child th": {
+                    border: 0,
+                  },
+                  ...(editRow === row.id && {
+                    backgroundColor: "action.hover",
+                  }),
+                }}
+              >
+                <TableCell
+                  sx={{
+                    width: "30%",
+                    fontWeight: 500,
+                  }}
+                >
                   {editRow === row.id ? (
                     <TextField
                       size="small"
-                      name={itemKey}
-                      value={editingItem?.[itemKey] ?? ""}
+                      fullWidth
+                      name="name"
+                      value={editingItem?.name ?? ""}
                       onChange={handleChange}
                     />
                   ) : (
-                    value
+                    row.name
                   )}
                 </TableCell>
-              );
-            })}
 
-            <TableCell>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleEdit(row)}
+                <TableCell align="center" sx={{ width: "20%" }}>
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      type="number"
+                      name="price"
+                      value={editingItem?.price ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    `₪${row.price}`
+                  )}
+                </TableCell>
+
+                <TableCell align="center" sx={{ width: "20%" }}>
+                  {editRow === row.id ? (
+                    <TextField
+                      size="small"
+                      type="number"
+                      name="quantity"
+                      value={editingItem?.quantity ?? ""}
+                      onChange={handleChange}
+                    />
+                  ) : (
+                    row.quantity
+                  )}
+                </TableCell>
+
+                <TableCell
+                  align="center"
+                  sx={{
+                    width: "30%",
+                  }}
                 >
-                  Edit
-                </Button>
-
-                {editRow === row.id && (
-                  <Button
-                    variant="contained"
-                    onClick={handleSave}
+                  <Stack
+                    sx={{
+                      justifyContent: "center",
+                    }}
+                    direction="row"
+                    spacing={1}
                   >
-                    Save
-                  </Button>
-                )}
+                    {editRow !== row.id && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={() => handleEdit(row)}
+                      >
+                        Edit
+                      </Button>
+                    )}
 
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => handleDelete(row)}
-                >
-                  Delete
-                </Button>
-              </Stack>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </MuiTable>
-  </Paper>
-)};
+                    {editRow === row.id && (
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={handleSave}
+                      >
+                        Save
+                      </Button>
+                    )}
+
+                    <Button
+                      size="small"
+                      variant="outlined"
+                      color="error"
+                      onClick={() => onDelete(row)}
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </MuiTable>
+    </Paper>
+  );
+}

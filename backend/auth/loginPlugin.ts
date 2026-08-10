@@ -1,7 +1,8 @@
-import { FastifyInstance } from "fastify";
-import type { User } from "../users/usersTypes";
-import fs from "fs/promises";
+import type { FastifyInstance } from "fastify";
+import type { User } from "../users/usersTypes.js";
 import bcrypt from 'bcrypt'
+import {prisma} from '../db/dbConn.js'
+import { messages } from "../messages.js";
 
 export default async function authRoutes(fastify: FastifyInstance) {
   fastify.post<{ Body: Pick<User, "username" | "password"> }>(
@@ -20,28 +21,26 @@ export default async function authRoutes(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       const { username, password } = request.body;
-      const data = await fs.readFile("users/users.json", "utf-8");
-
-      const users = JSON.parse(data);
-      const user = users.users.find((user: User) => {
-        return user.username === username;
+      const user = await prisma.user.findUnique({
+        where: { username },
       });
       if (!user){
-        reply.status(404).send({massage: "user for this username is not found"})
+       return reply.status(404).send({massage: messages.USER_NOT_FOUND})
       }
 
-      const correctPassword = await bcrypt.compare(password, user.password)
+      const correctPassword = await bcrypt.compare(password, user.passwordHash)
       if (!correctPassword){
-         reply.status(404).send({massage: "password isn`t correct"})
+        return reply.status(401).send({massage: messages.PASSWORD_INCORRECT})
 
       }
       const token = fastify.jwt.sign({
+        id: user.id,
         username,
         role: user.role
       },{
         expiresIn: '1d'
       })
-      reply.send({massage: 'token created seccessfully', username, token})
+      return reply.send({massage: messages.TOKEN_CREATED_SUCCESSFULLY, username, token})
     },
   );
 }

@@ -1,10 +1,9 @@
-import "./dashboard.css";
 import { useUser } from "../../state/user";
-import { Table } from "../../components/table/table";
+import { InventoryTable } from "../../components/table/table";
+import { useInventory } from "../../hooks/useInventory";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { fetchItems } from "../../api/dataApi";
-import type { Item } from "../../models/types";
+import Mazpenlogo from "../../assets/Mazpenlogo.png";
 import Model from "../../components/model/Model";
 import {
   AppBar,
@@ -16,7 +15,6 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  TextField,
   Button,
   Dialog,
 } from "@mui/material";
@@ -24,9 +22,8 @@ import {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUser();
-  const [data, setData] = useState<Item[]>([]);
-  const [filteredData, setFilteredData] = useState<Item[] | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { data, addItem, updateItem, removeItem } = useInventory();
 
   useEffect(() => {
     if (currentUser) {
@@ -37,30 +34,9 @@ export default function Dashboard() {
     }
   }, [currentUser]);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/login");
-  }
-
-  function handleSearch(event: React.ChangeEvent<HTMLInputElement>) {
-    const query = event.target.value;
-    const searchedData = data.filter((item: Item) => {
-      return item.name.includes(query);
-    });
-    setFilteredData(searchedData);
-  }
-
-  async function loadData() {
-    try {
-      const items = await fetchItems();
-      setData(items.items);
-    } catch (error) {
-      console.error("Failed to fetch items:", error);
-    }
   }
 
   return (
@@ -69,7 +45,7 @@ export default function Dashboard() {
         <Toolbar>
           <Box
             component="img"
-            src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Mazpenlogo.png/500px-Mazpenlogo.png"
+            src={Mazpenlogo}
             alt="Logo"
             sx={{
               height: 40,
@@ -80,15 +56,6 @@ export default function Dashboard() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Welcome, {currentUser}!
           </Typography>
-
-          <TextField
-            placeholder="Search..."
-            onChange={handleSearch}
-            sx={{
-              backgroundColor: "background.default",
-              borderRadius: 1,
-            }}
-          />
 
           <Button
             variant="contained"
@@ -154,17 +121,14 @@ export default function Dashboard() {
             Add Item
           </Button>
         </Box>
-
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <Model setIsOpen={setIsOpen} onSuccess={loadData} />
+        <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="sm">
+          <Model setIsOpen={setIsOpen} onSuccess={addItem} />
         </Dialog>
-
-        <Table data={filteredData ?? data} setData={setData} />
+        <InventoryTable
+          data={data}
+          onDelete={removeItem}
+          onUpdate={updateItem}
+        />
       </Box>
     </Box>
   );
