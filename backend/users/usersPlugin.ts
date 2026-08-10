@@ -3,8 +3,9 @@ import type { User } from "./usersTypes.js";
 import bcrypt from "bcrypt";
 import { prisma } from "../db/dbConn.js";
 import { env } from "../config/env.js";
+import { messages } from "../messages.js";
 
-export default async function usersPlogin(fastify: FastifyInstance) {
+export default async function usersPlugin(fastify: FastifyInstance) {
   fastify.post<{ Body: Omit<User, "id"> }>(
     "/users",
     {
@@ -20,14 +21,14 @@ export default async function usersPlogin(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      const { username, password, role } = request.body;
-
+      
+      const { username, password} = request.body;
       const user = await prisma.user.findUnique({
         where: { username },
       });
 
       if (user) {
-        return reply.status(400).send({ message: "User already exists" });
+        return reply.status(400).send({ message: messages.USER_ALREADY_EXISTS });
       }
 
       const salt = await bcrypt.genSalt(env.saltRounds);
@@ -37,14 +38,14 @@ export default async function usersPlogin(fastify: FastifyInstance) {
         data: {
           username,
           passwordHash: hashedPassword,
-          role: role || "user",
+          role: "user",
         },
       });
 
       reply
         .status(201)
         .send({
-          massage: "user created",
+          massage: messages.USER_CREATED,
           user: { id: newUser.id, username: newUser.username },
         });
     },

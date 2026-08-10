@@ -1,57 +1,122 @@
-import {register} from "../../api/registerApi";
+import { register } from "../../api/registerApi";
 import { useNavigate } from "react-router";
 import { useState } from "react";
-import './register.css';
+import logger from "../../utils/logging";
+import {
+  Box,
+  Paper,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
 
+type RegisterForm = {
+  username: string;
+  password: string;
+};
 
 export default function Register() {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [role, setRole] = useState<'admin' | 'user'>('user');
-    const navigate = useNavigate();
+  const [form, setForm] = useState<RegisterForm>({
+    username: "",
+    password: "",
+  });
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
-    async function handleRegister() {
+  async function handleRegister() {
+    setError(null);
 
-        if (!username || !password ) {
-            alert('Username and password are required');
-            return;
-        }
-        try {
-            await register({ username, password, role });
-            navigate('/login');
-        } catch (error) {
-            if (error instanceof Error) {
-                console.error('Registration failed:', error.message);
-                alert(`Registration failed: ${error.message}`);
-            } else {
-                console.error('Registration failed:', error);
-                alert('Registration failed: An unknown error occurred');
-            }
-        }
+    if (!form.username || !form.password) {
+      setError("Username and password are required");
+      return;
     }
 
-    return (
-        <div className="register-container">
-            <h1>Register</h1>
-            <div className="content-item">
-                <label htmlFor="username">Username</label>
-                <input
-                    type="text"
-                    id="username"
-                name="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-            />
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-            <label htmlFor="role">Role</label>
-            <select id="role" name="role" value={role} onChange={(e) => setRole(e.target.value as 'admin' | 'user')}>
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-            </select>
-            <button onClick={handleRegister}>Register</button>
-            <button onClick={() => navigate('/login')}>Back to Login</button>
-            </div>
-        </div>
-    );
+    try {
+      await register({
+        username: form.username,
+        password: form.password
+      });
+      navigate("/login");
+    } catch (error) {
+      if (error instanceof Error) {
+        logger.warn("Registration failed:", error.message);
+        setError(error.message);
+      } else {
+        logger.warn("Registration failed:", error);
+        setError("An unknown error occurred");
+      }
+    }
+  }
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: "background.default",
+        maxWidth: 400,
+        mx: "auto",
+        mt: 8,
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: 400,
+        }}
+      >
+        <Typography variant="h4" gutterBottom>
+          Register
+        </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <TextField
+          label="Username"
+          value={form.username}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              username: e.target.value,
+            }))
+          }
+          fullWidth
+          margin="normal"
+        />
+
+        <TextField
+          label="Password"
+          type="password"
+          value={form.password}
+          onChange={(e) =>
+            setForm((prev) => ({
+              ...prev,
+              password: e.target.value,
+            }))
+          }
+          fullWidth
+          margin="normal"
+        />
+
+        
+
+        <Button
+          variant="contained"
+          fullWidth
+          onClick={handleRegister}
+          sx={{ mt: 2 }}
+        >
+          Register
+        </Button>
+
+        <Button fullWidth sx={{ mt: 1 }} onClick={() => navigate("/login")}>
+          Back to Login
+        </Button>
+      </Paper>
+    </Box>
+  );
 }
