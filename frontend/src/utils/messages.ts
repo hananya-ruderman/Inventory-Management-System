@@ -22,7 +22,7 @@ export const FORM_LABELS = {
   ITEM: {
     NAME: "Name",
     PRICE: "Price",
-    QUANTITY: "Quantity",
+    STOCK: "stock",
   },
 };
 
@@ -30,6 +30,6 @@ export const FORM_FIELDS = {
   ITEM: {
     NAME: "name",
     PRICE: "price",
-    QUANTITY: "quantity",
+    STOCK: "stock",
   },
 };

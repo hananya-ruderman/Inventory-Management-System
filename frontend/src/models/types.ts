@@ -2,7 +2,7 @@ export interface Item {
     id: string | number;
     name: string;
     price: number;
-    quantity: number;
+    stock: number;
 }
 
 export interface User {

@@ -29,7 +29,7 @@ interface ModelProps {
 interface FormState {
   name: string;
   price: string;
-  quantity: string;
+  stock: string;
 }
 
 export default function Model(props: ModelProps) {
@@ -38,7 +38,7 @@ export default function Model(props: ModelProps) {
   const [form, setForm] = useState<FormState>({
     name: "",
     price: "",
-    quantity: "",
+    stock: "",
   });
   const [status, setStatus] = useState<Status>(STATUS.IDLE);
   const [isRequired, setIsRequired] = useState<boolean>(false);
@@ -55,7 +55,7 @@ export default function Model(props: ModelProps) {
     const newItem: NewItem = {
       name: form.name,
       price: +form.price,
-      quantity: form.quantity ? +form.quantity : 0,
+      stock: form.stock ? +form.stock : 0,
     };
 
     try {
@@ -134,13 +134,13 @@ export default function Model(props: ModelProps) {
           />
 
           <TextField
-            label={FORM_LABELS.ITEM.QUANTITY}
-            name={FORM_FIELDS.ITEM.QUANTITY}
-            value={form.quantity}
+            label={FORM_LABELS.ITEM.STOCK}
+            name={FORM_FIELDS.ITEM.STOCK}
+            value={form.stock}
             onChange={(e) =>
               setForm((prev) => ({
                 ...prev,
-                quantity: e.target.value,
+                stock: e.target.value,
               }))
             }
           />

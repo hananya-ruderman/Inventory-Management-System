@@ -95,7 +95,7 @@ export function InventoryTable({ data, onDelete, onUpdate }: Props) {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell align="center">Price</TableCell>
-            <TableCell align="center">Quantity</TableCell>
+            <TableCell align="center">stock</TableCell>
             <TableCell align="center">Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -159,12 +159,12 @@ export function InventoryTable({ data, onDelete, onUpdate }: Props) {
                     <TextField
                       size="small"
                       type="number"
-                      name="quantity"
-                      value={editingItem?.quantity ?? ""}
+                      name="stock"
+                      value={editingItem?.stock ?? ""}
                       onChange={handleChange}
                     />
                   ) : (
-                    row.quantity
+                    row.stock
                   )}
                 </TableCell>
 
