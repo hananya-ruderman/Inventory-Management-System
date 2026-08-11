@@ -1,9 +1,9 @@
-import "./dashboard.css";
 import { useUser } from "../../state/user";
-import { Table } from "../../components/table/table";
+import { InventoryTable } from "../../components/table/table";
+import { useInventory } from "../../hooks/useInventory";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import Mazpenlogo from "../../assets/Mazpenlogo.png"
+import Mazpenlogo from "../../assets/Mazpenlogo.png";
 import Model from "../../components/model/Model";
 import {
   AppBar,
@@ -23,7 +23,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { currentUser, setCurrentUser } = useUser();
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [refresh, setRefresh] = useState(0);
+  const { data, addItem, updateItem, removeItem } = useInventory();
 
   useEffect(() => {
     if (currentUser) {
@@ -34,15 +34,11 @@ export default function Dashboard() {
     }
   }, [currentUser]);
 
-  
   function handleLogout() {
     localStorage.removeItem("token");
     navigate("/login");
   }
 
-  
-
-  
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
       <AppBar position="fixed">
@@ -61,8 +57,6 @@ export default function Dashboard() {
             Welcome, {currentUser}!
           </Typography>
 
-          
-
           <Button
             variant="contained"
             color="error"
@@ -77,7 +71,7 @@ export default function Dashboard() {
       <Drawer
         variant="permanent"
         sx={{
-          width:240,
+          width: 240,
           flexShrink: 0,
 
           "& .MuiDrawer-paper": {
@@ -127,19 +121,15 @@ export default function Dashboard() {
             Add Item
           </Button>
         </Box>
-
-        <Dialog
-          open={isOpen}
-          onClose={() => setIsOpen(false)}
-          maxWidth="sm"
-        >
-          <Model
-  setIsOpen={setIsOpen}
-  onSuccess={() => setRefresh(prev => prev + 1)}
-/>
+        <Dialog open={isOpen} onClose={() => setIsOpen(false)} maxWidth="sm">
+          <Model setIsOpen={setIsOpen} onSuccess={addItem} />
         </Dialog>
-
-<Table refresh={refresh}/>      </Box>
+        <InventoryTable
+          data={data}
+          onDelete={removeItem}
+          onUpdate={updateItem}
+        />
+      </Box>
     </Box>
   );
 }

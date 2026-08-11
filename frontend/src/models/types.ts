@@ -11,3 +11,6 @@ export interface User {
     password: string;
 }
 
+export type NewItem = Omit<Item, "id">
+
+
